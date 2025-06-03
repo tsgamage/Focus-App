@@ -54,7 +54,7 @@ class FocusApp(tb.Window):
             bootstyle="primary",
             metersize=220,
             padding=5,
-            amounttotal=60,
+            amounttotal=100,
             amountused=0,
             metertype="semi",
             # subtext="miles per hour",
@@ -162,6 +162,21 @@ class FocusApp(tb.Window):
 
         tb.Button(settings_win, text="Save", command=settings_win.destroy).pack(pady=20)
 
+    def update_timer_widget(self, minutes, seconds, state):
+        initial_count = 0
+        if state.lower() == 'l':
+            initial_count = self.LONG_BREAK_SEC
+        if state.lower() == 's':
+            initial_count = self.SMALL_BREAK_SEC
+        if state.lower() == 'w':
+            initial_count = self.WORKING_TIME_SEC
+
+        self.timer.configure(text=f"{minutes}:{seconds}")
+        used_amount = (int(seconds) / initial_count) * 100
+        self.meter.configure(
+            amountused=used_amount
+        )
+
     # The function that's control the app's state
     def call_timer(self):
         """
@@ -185,17 +200,17 @@ class FocusApp(tb.Window):
 
         # If this function runs 8 times, It means it's time for a long break
         if self.loop_time == 8:
-            self.update_timer(self.LONG_BREAK_SEC)
+            self.update_timer(self.LONG_BREAK_SEC, "l")
 
         #  All the loop time numbers for a short break are odd value, So this will check whether its odd and set app's state to short Break
         elif self.loop_time % 2 == 0:
-            self.update_timer(self.SMALL_BREAK_SEC)
+            self.update_timer(self.SMALL_BREAK_SEC, "s")
 
         #  All the loop time numbers for a Working time are even value, So this will check whether its even and set app's state to working
         elif self.loop_time % 2 == 1:
-            self.update_timer(self.WORKING_TIME_SEC)
+            self.update_timer(self.WORKING_TIME_SEC, "w")
 
-    def update_timer(self, count):
+    def update_timer(self, count, state):
         timer_min = math.floor(count / 60)
         timer_sec = count % 60
 
@@ -211,12 +226,12 @@ class FocusApp(tb.Window):
         if timer_sec == 0:
             timer_sec = "00"
 
-        self.timer.configure(text=f"{timer_min}:{timer_sec}")
+        self.update_timer_widget(timer_min, timer_sec, state)
 
-        if count > 0:
+        if count >= 0:
             global timer
             # Runs the whole function continuously after every second
-            timer = self.after(1000, self.update_timer, count - 1)
+            timer = self.after(1000, self.update_timer, count - 1, state)
 
         else:
             # When the timer hits 'zero,' it means it's time to change the app state (Working, Short Break, Long Break)
