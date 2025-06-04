@@ -1,17 +1,25 @@
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 import tkinter as tk
+from tkinter import filedialog
 from tkinter import messagebox
+import pathlib
+import os
+
 
 class FocusApp(tb.Window):
     def __init__(self):
         super().__init__(themename='superhero')
 
-        app_icon = tk.PhotoImage(file="./assets/icon/Focus.png")
+        self.app_icon_path = "./assets/icon/Focus.png"
+        app_icon = tk.PhotoImage(file=self.app_icon_path)
         self.loop_time = 0
         self.timer_started = False
         self.timer = None
         self.minimized = False
+        self.users_working_min = 0
+        self.users_short_break_min = 0
+        self.users_long_break_min = 0
 
         self.WORK_MIN = 5
         self.SHORT_BREAK_MIN = 3
@@ -57,7 +65,7 @@ class FocusApp(tb.Window):
             metersize=220,
             padding=5,
             amounttotal=100,
-            amountused=0,
+            amountused=60,
             metertype="semi",
             # subtext="miles per hour",
             meterthickness=20,
@@ -75,7 +83,7 @@ class FocusApp(tb.Window):
 
         self.sound_tick = tb.Checkbutton(
             master=self.main_tab,
-            text="Play Sound",
+            text="Play Session Sound",
             bootstyle="primary-round-toggle",
             cursor="hand2",
             variable=self.sound_tick_value
@@ -87,7 +95,7 @@ class FocusApp(tb.Window):
 
         self.minimize_to_tray = tb.Checkbutton(
             master=self.main_tab,
-            text="Minimize to Tray",
+            text="Minimize to Taskbar",
             bootstyle="primary-round-toggle",
             cursor="hand2",
             variable=self.minimize_to_tray_value
@@ -123,10 +131,19 @@ class FocusApp(tb.Window):
         )
         self.start_pause_button.grid(row=5, column=0, columnspan=2, pady=(8, 20))
 
+    def on_browse(self):
+        """Callback for directory browse"""
+        path = filedialog.askopenfilename(title="Select an MP3 File", filetypes=[("MP3 Files", "*.mp3")])
+        if path:
+            self.entry_var.set(path)
+
+        os.startfile(path)
+
     def open_settings(self):
-        settings_win = tk.Toplevel(self)
+        settings_win = tb.Toplevel()
         settings_win.title("Settings")
-        settings_win.geometry("300x300")
+        settings_win.geometry("300x350")
+        settings_win.configure(pady=10, padx=10)
         settings_win.resizable(False, False)
 
         # Centering the window
@@ -137,7 +154,7 @@ class FocusApp(tb.Window):
         main_height = self.winfo_height()
 
         win_width = 300
-        win_height = 300
+        win_height = 350
         pos_x = x + (main_width // 2) - (win_width // 2)
         pos_y = y + (main_height // 2) - (win_height // 2)
 
@@ -156,10 +173,47 @@ class FocusApp(tb.Window):
 
         settings_win.protocol("WM_DELETE_WINDOW", on_close)
 
-        tb.Label(settings_win, text="Sound", font=("Segoe UI", 12)).pack(pady=10)
-        tb.Checkbutton(settings_win, text="Play sound at session end").pack()
+        settings_win.grid_columnconfigure(0, weight=1)
+        settings_win.grid_rowconfigure(0, weight=1)
 
-        tb.Label(settings_win, text="Theme", font=("Segoe UI", 12)).pack(pady=10)
-        tb.Combobox(settings_win, values=["Superhero", "Darkly", "Flatly"]).pack()
+        session_sound_label_frame = tb.LabelFrame(settings_win, text="Set custom session changing sound",
+                                                  padding=(10, 5))
+        session_sound_label_frame.pack(fill="x", pady=(0, 10))
 
-        tb.Button(settings_win, text="Save", command=settings_win.destroy).pack(pady=20)
+        self.entry_var = tk.StringVar()
+        tb.Entry(session_sound_label_frame, textvariable=self.entry_var, width=27).grid(row=1, column=0, pady=(5),
+                                                                                        padx=(0, 10))
+        tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).grid(row=1,
+                                                                                                                  column=1)
+
+        custom_timer_input_frame = tb.Labelframe(settings_win, text="Enter times in minutes", padding=(10, 5))
+        custom_timer_input_frame.pack(fill="x", pady=(0, 10))
+
+        tb.Label(custom_timer_input_frame, text="Focus Time           :").grid(row=0, column=0, padx=(0, 20),
+                                                                               pady=(0, 10))
+        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10).grid(row=0, column=1, pady=(0, 10))
+        tb.Label(custom_timer_input_frame, text="min").grid(row=0, column=2, pady=(0, 10))
+
+        tb.Label(custom_timer_input_frame, text="Short Break Time :").grid(row=1, column=0, padx=(0, 20), pady=(0, 10))
+        tb.Spinbox(custom_timer_input_frame, from_=0, to=30, width=10).grid(row=1, column=1, pady=(0, 10))
+        tb.Label(custom_timer_input_frame, text="min").grid(row=1, column=2, pady=(0, 10))
+
+        tb.Label(custom_timer_input_frame, text="Long Break Time  :").grid(row=2, column=0, padx=(0, 20), pady=(0, 10))
+        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10, ).grid(row=2, column=1, pady=(0, 10))
+        tb.Label(custom_timer_input_frame, text="min").grid(row=2, column=2, pady=(0, 10))
+
+        app_theme_change_frame = tb.Labelframe(settings_win, text="Change application theme", padding=(10, 5))
+        app_theme_change_frame.pack(fill="x", pady=(0, 10))
+
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="primary", width=10, text="Blue").grid(row=0,
+                                                                                                           column=0,
+                                                                                                           padx=(0,
+                                                                                                                 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=9, text="Dark").grid(row=0, column=1,
+                                                                                                       padx=(0, 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White").grid(row=0,
+                                                                                                          column=2)
+
+        tb.Button(settings_win, cursor="hand2", bootstyle="success", text="Save Changes", command=settings_win.destroy,
+                  width=40).pack(
+            fill="x")
