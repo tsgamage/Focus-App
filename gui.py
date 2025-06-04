@@ -2,8 +2,6 @@ import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 import tkinter as tk
 from tkinter import messagebox
-import math
-
 
 class FocusApp(tb.Window):
     def __init__(self):
@@ -11,6 +9,9 @@ class FocusApp(tb.Window):
 
         app_icon = tk.PhotoImage(file="./assets/icon/Focus.png")
         self.loop_time = 0
+        self.timer_started = False
+        self.timer = None
+        self.minimized = False
 
         self.WORK_MIN = 5
         self.SHORT_BREAK_MIN = 3
@@ -26,6 +27,7 @@ class FocusApp(tb.Window):
         self.iconphoto(False, app_icon)
         self.iconphoto(True, app_icon)
         self.resizable(False, False)
+        # self.eval('tk::PlaceWindow . center')
 
         self.notebook = tb.Notebook()
         self.notebook.grid(row=0, column=0, sticky='nsew', padx=0, pady=0)
@@ -51,7 +53,7 @@ class FocusApp(tb.Window):
 
         self.meter = tb.Meter(
             master=self.main_tab,
-            bootstyle="primary",
+            bootstyle="success",
             metersize=220,
             padding=5,
             amounttotal=100,
@@ -65,8 +67,8 @@ class FocusApp(tb.Window):
         )
         self.meter.grid(row=2, column=0, columnspan=2)
 
-        self.timer = tb.Label(master=self.main_tab, text="25:00", font=("poppins", 22), bootstyle="primary")
-        self.timer.grid(row=2, column=0, columnspan=2)
+        self.timer_label = tb.Label(master=self.main_tab, text="25:00", font=("poppins", 22), bootstyle="primary")
+        self.timer_label.grid(row=2, column=0, columnspan=2)
 
         self.sound_tick_value = tb.StringVar()
         self.sound_tick_value.set("1")
@@ -117,7 +119,7 @@ class FocusApp(tb.Window):
             text="Start",
             width=48,
             bootstyle="success",
-            cursor="hand2"
+            cursor="hand2",
         )
         self.start_pause_button.grid(row=5, column=0, columnspan=2, pady=(8, 20))
 
@@ -161,83 +163,3 @@ class FocusApp(tb.Window):
         tb.Combobox(settings_win, values=["Superhero", "Darkly", "Flatly"]).pack()
 
         tb.Button(settings_win, text="Save", command=settings_win.destroy).pack(pady=20)
-
-    def update_timer_widget(self, minutes, seconds, state):
-        initial_count = 0
-        if state.lower() == 'l':
-            initial_count = self.LONG_BREAK_SEC
-        if state.lower() == 's':
-            initial_count = self.SMALL_BREAK_SEC
-        if state.lower() == 'w':
-            initial_count = self.WORKING_TIME_SEC
-
-        self.timer.configure(text=f"{minutes}:{seconds}")
-        used_amount = (int(seconds) / initial_count) * 100
-        self.meter.configure(
-            amountused=used_amount
-        )
-
-    # The function that's control the app's state
-    def call_timer(self):
-        """
-        The interval periods of this app
-
-        1: 25 minutes of work,
-        2: 5-minute break,
-        3: 25 minutes of work,
-        4: 5-minute break,
-        5: 25 minutes of work,
-        6: 5-minute break,
-        7: 25 minutes of work,
-        8: 20 minutes of long break
-
-        """
-
-        #  Keep track of how many times this function called
-        self.loop_time += 1
-        # Removed always on top status from app, So user can use another app without distracted from with this app's window
-        self.attributes("-topmost", False)
-
-        # If this function runs 8 times, It means it's time for a long break
-        if self.loop_time == 8:
-            self.update_timer(self.LONG_BREAK_SEC, "l")
-
-        #  All the loop time numbers for a short break are odd value, So this will check whether its odd and set app's state to short Break
-        elif self.loop_time % 2 == 0:
-            self.update_timer(self.SMALL_BREAK_SEC, "s")
-
-        #  All the loop time numbers for a Working time are even value, So this will check whether its even and set app's state to working
-        elif self.loop_time % 2 == 1:
-            self.update_timer(self.WORKING_TIME_SEC, "w")
-
-    def update_timer(self, count, state):
-        timer_min = math.floor(count / 60)
-        timer_sec = count % 60
-
-        # Adding a '0' to the front of minutes when it is smaller than 10
-        if timer_min < 10:
-            timer_min = f"0{timer_min}"
-
-        # Adding a '0' to the front of seconds when it is smaller than 10
-        if timer_sec < 10:
-            timer_sec = f"0{timer_sec}"
-
-        # Adding 00 to the seconds when it is zero
-        if timer_sec == 0:
-            timer_sec = "00"
-
-        self.update_timer_widget(timer_min, timer_sec, state)
-
-        if count >= 0:
-            global timer
-            # Runs the whole function continuously after every second
-            timer = self.after(1000, self.update_timer, count - 1, state)
-
-        else:
-            # When the timer hits 'zero,' it means it's time to change the app state (Working, Short Break, Long Break)
-            # Before calling the call_timer function, the app needs to go to the top of the screen
-            # So, the user knows when it's time to a break, or it's time to work
-            self.attributes("-topmost", True)
-
-            # After the application comes to the top of the screen, the call_timer function will be executed
-            self.call_timer()
