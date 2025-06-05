@@ -1,7 +1,11 @@
+from ttkbootstrap.toast import ToastNotification
 from gui import FocusApp
-import threading
-from time import sleep
 import math
+import pystray
+from pystray import MenuItem as item
+from PIL import Image
+import threading
+
 
 
 app = FocusApp()
@@ -11,9 +15,11 @@ current_running_seconds: int = 0
 session_times: dict = {"focus":6, "shortB":3, "longB":5}
 current_session: str = "focus" # Can use focus, shortB, and longB
 session_number: int = 7
-session_started: bool = False
 timer = ''
+session_started: bool = False
+is_minimized = False
 
+window_bottom_text = "Only 3 more sessions to for a long break."
 
 def formate_time(seconds:int):
     """ Returns the time in min:sec format """
@@ -161,7 +167,7 @@ def handle_start_pause_button():
         app.settings_button.configure(state="normal", cursor="hand2")
 
         app.main_bottom_text.configure(text="Paused! Press Start to continue.")
-        app.progress_bottom_text.configure(text="Paused! Press Start to continue.")
+        app.progress_bottom_text.configure(text="Paused! Press Start in Focus Zone to continue.")
         pause_session()
     else:
         session_started = True
@@ -172,9 +178,48 @@ def handle_start_pause_button():
         app.skip_button.configure(state="disabled", cursor="arrow")
         app.settings_button.configure(state="disabled", cursor="arrow")
 
-        app.main_bottom_text.configure(text="Only 3 more sessions to for a long break.")
-        app.progress_bottom_text.configure(text="Only 3 more sessions to for a long break.")
+        app.main_bottom_text.configure(text=window_bottom_text)
+        app.progress_bottom_text.configure(text=window_bottom_text)
         start_session()
+
+def hide_window():
+
+    def quit_window(icon, item):
+        icon.stop()
+        # app.destroy()
+        app.quit()
+
+    def show_window(icon, item):
+        global is_minimized
+        is_minimized = False
+        icon.stop()
+        app.after(0, app.deiconify)
+
+    def show_about():
+        toast = ToastNotification(
+            title="About Focus App",
+            message="Made with 🖤 by Princess Software Solutions",
+            duration=5000,
+            alert=True,
+            icon="🖤",
+        )
+        toast.show_toast()
+
+    app.withdraw()
+    image = Image.open("./assets/icon/Focus.png")
+    menu = (item("Restore", show_window, default=True),item("About", show_about), item('Quit', quit_window))
+    icon = pystray.Icon("Focus", image, "Focus App", menu)
+    threading.Thread(target=icon.run).start()
+
+def on_minimize(event):
+    if app.minimize_to_tray_tick.get():
+        global is_minimized
+        if app.state() == 'iconic' and not is_minimized:
+            is_minimized = True
+            hide_window()
+
+app.bind("<Unmap>", on_minimize)
+
 
 app.start_pause_button.configure(command=handle_start_pause_button)
 app.skip_button.configure(command=skip_session)

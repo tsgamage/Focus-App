@@ -143,7 +143,7 @@ class FocusApp(tb.Window):
         tb.Separator(self.main_tab, orient='horizontal').grid(row=6, column=0, columnspan=2, pady=(10, 2), sticky="ew")
 
 
-        self.main_bottom_text = tb.Label(master=self.main_tab,text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
+        self.main_bottom_text = tb.Label(master=self.main_tab,text="Made with 🖤 by Princess Software Solutions", font=("poppins", 10), bootstyle="info")
         self.main_bottom_text.grid(row=7, column=0, columnspan=2)
 
         #     ---------------------------- PROGRESS TAB ----------------------------
@@ -231,7 +231,7 @@ class FocusApp(tb.Window):
 
         tb.Separator(self.progress_tab, orient='horizontal').pack( fill="x", pady=(10, 2))
 
-        self.progress_bottom_text = tb.Label(master=self.progress_tab, text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
+        self.progress_bottom_text = tb.Label(master=self.progress_tab, text="Made with 🖤 by Princess Software Solutions", font=("poppins", 10), bootstyle="info")
         self.progress_bottom_text.pack()
 
     def reset_progress(self):
