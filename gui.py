@@ -28,7 +28,7 @@ class FocusApp(tb.Window):
         self.app_theme_name.set("superhero")
 
         self.title("Focus App")
-        self.geometry("350x480")
+        self.geometry("350x512")
         self.iconphoto(False, app_icon)
         self.iconphoto(True, app_icon)
         self.resizable(False, False)
@@ -75,7 +75,7 @@ class FocusApp(tb.Window):
         )
         self.main_meter.grid(row=2, column=0, columnspan=2)
 
-        self.timer_label = tb.Label(master=self.main_tab, text="00:00", font=("poppins", 22), bootstyle="info")
+        self.timer_label = tb.Label(master=self.main_tab, text="00:00", font=("poppins", 28), bootstyle="info")
         self.timer_label.grid(row=2, column=0, columnspan=2)
 
         self.play_session_sound_tick.set(True)
@@ -98,34 +98,53 @@ class FocusApp(tb.Window):
         )
         self.minimize_to_tray.grid(row=3, column=1)
 
-        self.reset_button = tb.Button(
-            master=self.main_tab,
-            text="Reset",
-            width=22,
-            bootstyle="danger",
+        reset_btn_frame = tb.Frame(self.main_tab)
+        reset_btn_frame.grid(row=4, column=0, columnspan=2, pady=(20, 0), sticky="w")
+
+        self.skip_button = tb.Button(
+            master=reset_btn_frame,
+            text="Skip >>",
+            width=8,
+            bootstyle="warning",
             cursor="hand2",
-            # state="disabled"
         )
-        self.reset_button.grid(row=4, column=0, pady=(20, 0), padx=(0, 10))
+        self.skip_button.grid(row=0, column=0)
+
+        self.reset_timer = tb.Button(
+            master=reset_btn_frame,
+            text="Reset Timer",
+            cursor="hand2",
+            takefocus=False,
+            bootstyle="danger",
+            width=23,
+        )
+        self.reset_timer.grid(row=0, column=1)
 
         self.settings_button = tb.Button(
-            master=self.main_tab,
+            master=reset_btn_frame,
             text="Settings",
-            width=22,
+            width=8,
             bootstyle="primary",
             cursor="hand2",
             command=self.open_settings
         )
-        self.settings_button.grid(row=4, column=1, pady=(20, 0))
+        self.settings_button.grid(row=0, column=2)
 
         self.start_pause_button = tb.Button(
             master=self.main_tab,
             text="Start",
-            width=48,
+            width=49,
             bootstyle="success",
-            cursor="hand2",
+            cursor="hand2"
         )
-        self.start_pause_button.grid(row=5, column=0, columnspan=2, pady=(8, 20))
+        self.start_pause_button.grid(row=5, column=0, columnspan=2, pady=(8, 0))
+
+
+        tb.Separator(self.main_tab, orient='horizontal').grid(row=6, column=0, columnspan=2, pady=(10, 2), sticky="ew")
+
+
+        self.bottom_text = tb.Label(master=self.main_tab,text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
+        self.bottom_text.grid(row=7, column=0, columnspan=2)
 
         #     ---------------------------- PROGRESS TAB ----------------------------
 
@@ -208,6 +227,12 @@ class FocusApp(tb.Window):
 
         self.reset_progress_button = tb.Button(self.progress_tab, text="Reset Today Progress", bootstyle="danger-outline", cursor="hand2", command=self.reset_progress, takefocus=False)
         self.reset_progress_button.pack(pady=(12, 0))
+
+
+        tb.Separator(self.progress_tab, orient='horizontal').pack( fill="x", pady=(10, 2))
+
+        self.bottom_text = tb.Label(master=self.progress_tab, text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
+        self.bottom_text.pack()
 
     def reset_progress(self):
         if tk.messagebox.askyesno("Reset Progress", "Are you sure you want to reset today's progress?"):
