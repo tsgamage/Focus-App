@@ -15,6 +15,53 @@ session_number: int = 7
 session_started: bool = False
 timer = ''
 
+def toggle_reset_timer_button():
+    if app.reset_timer_button.cget("state") == "normal":
+        app.reset_timer_button.configure(state="disabled")
+        app.reset_timer_button.configure(cursor="arrow")
+    else:
+        app.reset_timer_button.configure(state="normal")
+        app.reset_timer_button.configure(cursor="hand2")
+
+def toggle_skip_button():
+    if app.skip_button.cget("state") == "normal":
+        app.skip_button.configure(state="disabled")
+        app.skip_button.configure(cursor="arrow")
+    else:
+        app.skip_button.configure(state="normal")
+        app.skip_button.configure(cursor="hand2")
+
+def toggle_settings_button():
+    if app.settings_button.cget("state") == "normal":
+        app.settings_button.configure(state="disabled")
+        app.settings_button.configure(cursor="arrow")
+    else:
+        app.settings_button.configure(state="normal")
+        app.settings_button.configure(cursor="hand2")
+
+def toggle_start_pause_button():
+    if app.start_pause_button.cget("state") == "normal":
+        app.start_pause_button.configure(state="disabled")
+        app.start_pause_button.configure(cursor="arrow")
+    else:
+        app.start_pause_button.configure(state="normal")
+        app.start_pause_button.configure(cursor="hand2")
+
+def toggle_reset_progress_button():
+    if app.reset_progress_button.cget("state") == "normal":
+        app.reset_progress_button.configure(state="disabled")
+        app.reset_progress_button.configure(cursor="arrow")
+    else:
+        app.reset_progress_button.configure(state="normal")
+        app.reset_progress_button.configure(cursor="hand2")
+
+def toggle_all_buttons():
+    toggle_reset_timer_button()
+    toggle_skip_button()
+    toggle_settings_button()
+    toggle_start_pause_button()
+
+
 
 def formate_time(seconds:int):
     """ Returns the time in min:sec format """
