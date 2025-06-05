@@ -59,23 +59,23 @@ class FocusApp(tb.Window):
         self.quote_text = tb.Label(master=self.main_tab, text="-Never give in and never give up-", font=("poppins", 10))
         self.quote_text.grid(row=1, column=0, columnspan=2)
 
-        self.meter = tb.Meter(
+        self.main_meter = tb.Meter(
             master=self.main_tab,
-            bootstyle="primary",
+            bootstyle="info",
             metersize=220,
             padding=5,
             amounttotal=100,
-            amountused=60,
+            amountused=0,
             metertype="semi",
             # subtext="miles per hour",
             meterthickness=20,
             stripethickness=3,
             showtext=False,
-            interactive=True
+            interactive=False
         )
-        self.meter.grid(row=2, column=0, columnspan=2)
+        self.main_meter.grid(row=2, column=0, columnspan=2)
 
-        self.timer_label = tb.Label(master=self.main_tab, text="25:00", font=("poppins", 22), bootstyle="primary")
+        self.timer_label = tb.Label(master=self.main_tab, text="00:00", font=("poppins", 22), bootstyle="info")
         self.timer_label.grid(row=2, column=0, columnspan=2)
 
         self.play_session_sound_tick.set(True)
@@ -198,7 +198,7 @@ class FocusApp(tb.Window):
             subtext="120/300",
             meterthickness=15,
             showtext=False,
-            interactive=True
+            interactive=False
         )
         self.target_min_meter.pack()
         self.target_min_meter_label = tb.Label(target_time_frame, text="Target Focus", font=("poppins", 12))
@@ -309,8 +309,33 @@ class FocusApp(tb.Window):
             self.app_theme_name.set(theme)
             self.style.theme_use(self.app_theme_name.get())
 
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="primary", width=10, text="Blue", command=lambda : change_app_theme("superhero")).grid(row=0,column=0,padx=(0, 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="info", width=10, text="Blue", command=lambda : change_app_theme("superhero")).grid(row=0,column=0,padx=(0, 5))
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : change_app_theme("flatly")).grid(row=0,column=2)
 
         tb.Button(settings_win, cursor="hand2", bootstyle="success", text="Save Changes",command=settings_win.destroy).pack(fill="x")
+
+    def update_ui_timer(self, formated_time:str):
+        """Update the timer label"""
+        self.timer_label.configure(text=formated_time)
+
+    def update_timer_color(self, amount_used:int):
+        """Update the timer & label color"""
+        if amount_used > 60:
+            self.main_meter.configure(bootstyle="warning")
+            self.timer_label.configure(bootstyle="warning")
+        elif amount_used > 30:
+            self.main_meter.configure(bootstyle="info")
+            self.timer_label.configure(bootstyle="info")
+        elif amount_used > 0:
+            self.main_meter.configure(bootstyle="success")
+            self.timer_label.configure(bootstyle="success")
+
+        elif amount_used == 0:
+            self.main_meter.configure(bootstyle="primary")
+            self.timer_label.configure(bootstyle="primary")
+
+    def update_ui_meter(self, amount_used:int):
+        """Update the meter in the main tab"""
+        # self.update_timer_color(amount_used)
+        self.main_meter.configure(amountused=amount_used)
