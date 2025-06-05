@@ -120,51 +120,60 @@ def skip_session():
     session_number += 1
     if session_number > 8:
         reset_variables()
-    app.start_pause_button.configure(state="disabled")
+    app.start_pause_button.configure(state="disabled", cursor="arrow")
     handle_start_pause_button()
-    app.after(3000, lambda :    app.start_pause_button.configure(state="normal"))
+    app.after(3000, lambda :    app.start_pause_button.configure(state="normal", cursor="hand2")  )
 
 def reset_timer():
     print("Resetting timer")
     global current_running_seconds
 
     def back_to_normal():
-        app.start_pause_button.configure(state="normal")
-        app.settings_button.configure(state="normal")
+        # Enable buttons
+        app.start_pause_button.configure(state="normal", cursor="hand2")
+        app.settings_button.configure(state="normal", cursor="hand2")
+
         app.main_bottom_text.configure(text="Paused! Press Start to continue.")
         print("Timer has been reset")
 
-    app.start_pause_button.configure(state="disabled")
-    app.skip_button.configure(state="disabled")
-    app.reset_timer_button.configure(state="disabled")
-    app.settings_button.configure(state="disabled")
+    # Disable all Buttons
+    app.reset_timer_button.configure(state="disabled", cursor="arrow")
+    app.skip_button.configure(state="disabled", cursor="arrow")
+    app.settings_button.configure(state="disabled", cursor="arrow")
+    app.start_pause_button.configure(state="disabled", cursor="arrow")
+
     current_running_seconds = 0
     app.update_ui_meter(100)
     app.update_ui_timer(formate_time(session_times[f"{current_session}"]))
     app.main_bottom_text.configure(text="Timer has reset!.")
     app.after(500, back_to_normal)
 
-
 def handle_start_pause_button():
     global session_started
 
     if session_started:
+        session_started = False
         app.start_pause_button.configure(text="Start")
+
+        # Enable all buttons
+        app.reset_timer_button.configure(state="normal", cursor="hand2")
+        app.skip_button.configure(state="normal", cursor="hand2")
+        app.settings_button.configure(state="normal", cursor="hand2")
+
         app.main_bottom_text.configure(text="Paused! Press Start to continue.")
         app.progress_bottom_text.configure(text="Paused! Press Start to continue.")
-        app.skip_button.configure(state="normal")
-        app.reset_timer_button.configure(state="normal")
-        app.reset_timer_button.configure(cursor="hand2")
-        app.settings_button.configure(state="normal")
-        session_started = False
         pause_session()
     else:
+        session_started = True
         app.start_pause_button.configure(text="Pause")
+
+        # Disable all buttons
+        app.reset_timer_button.configure(state="disabled", cursor="arrow")
+        app.skip_button.configure(state="disabled", cursor="arrow")
+        app.settings_button.configure(state="disabled", cursor="arrow")
+
         app.main_bottom_text.configure(text="Only 3 more sessions to for a long break.")
         app.progress_bottom_text.configure(text="Only 3 more sessions to for a long break.")
-        app.reset_timer_button.configure(state="disabled")
-        app.reset_timer_button.configure(cursor="arrow")
-        session_started = True
         start_session()
 
 app.start_pause_button.configure(command=handle_start_pause_button)

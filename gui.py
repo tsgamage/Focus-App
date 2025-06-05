@@ -106,7 +106,6 @@ class FocusApp(tb.Window):
             text="Skip >>",
             width=8,
             bootstyle="warning",
-            cursor="hand2",
             state="disabled"
         )
         self.skip_button.grid(row=0, column=0, padx=(0, 7))
@@ -114,7 +113,6 @@ class FocusApp(tb.Window):
         self.reset_timer_button = tb.Button(
             master=reset_btn_frame,
             text="Reset Timer",
-            cursor="hand2",
             takefocus=False,
             bootstyle="danger",
             width=21,
