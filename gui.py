@@ -131,6 +131,99 @@ class FocusApp(tb.Window):
         )
         self.start_pause_button.grid(row=5, column=0, columnspan=2, pady=(8, 20))
 
+        #     ---------------------------- PROGRESS TAB ----------------------------
+
+        self.focus_progress_today_frame = tb.LabelFrame(self.progress_tab, text="  Focus Progress Today  ",
+                                                        padding=10)
+        self.focus_progress_today_frame.pack(fill="x", padx=0, pady=0)
+
+        # Create a frame for the first line
+        first_line_frame = tb.Frame(self.focus_progress_today_frame)
+        first_line_frame.pack(fill="x", pady=2)
+
+        self.focus_sessions_today_label = tb.Label(first_line_frame, text="Total Focus Sessions  :",
+                                                   font=("poppins", 12))
+        self.focus_sessions_today_label.pack(side="left")
+        self.focus_sessions_today_value = tb.Label(first_line_frame, text="9", font=("poppins", 12),
+                                                   bootstyle="success")
+        self.focus_sessions_today_value.pack(side="right")
+
+        # Create a frame for the second line
+        second_line_frame = tb.Frame(self.focus_progress_today_frame)
+        second_line_frame.pack(fill="x", pady=2)
+
+        self.total_focus_minutes = tb.Label(second_line_frame, text="Total Focus Time         :", font=("poppins", 12))
+        self.total_focus_minutes.pack(side="left")
+        self.total_focus_minutes_value = tb.Label(second_line_frame, text="9h & 44min", font=("poppins", 12),
+                                                  bootstyle="success")
+        self.total_focus_minutes_value.pack(side="right")
+
+        # Create a frame for the third line
+        third_line_frame = tb.Frame(self.focus_progress_today_frame)
+        third_line_frame.pack(fill="x", pady=2)
+
+        self.total_breaks_today_label = tb.Label(third_line_frame, text="Total Break Time         :",
+                                                 font=("poppins", 12))
+        self.total_breaks_today_label.pack(side="left")
+        self.total_breaks_today_value = tb.Label(third_line_frame, text="1h & 44min", font=("poppins", 12),
+                                                 bootstyle="warning")
+        self.total_breaks_today_value.pack(side="right")
+
+        self.focus_progress_target_frame = tb.LabelFrame(self.progress_tab, text="  Focus Target  ",
+                                                         padding=10, )
+        self.focus_progress_target_frame.pack(fill="x", padx=0, pady=(8, 0))
+
+        target_sessions_frame = tb.Frame(self.focus_progress_target_frame)
+        target_sessions_frame.pack(side="left")
+
+        self.focus_target_meter = tb.Meter(target_sessions_frame,
+                                           bootstyle="success",
+                                           metersize=100,
+                                           padding=5,
+                                           amounttotal=10,
+                                           amountused=8,
+                                           metertype="semi",
+                                           subtext="8/10",
+                                           meterthickness=15,
+                                           showtext=False,
+                                           interactive=True)
+        self.focus_target_meter.pack()
+        self.focus_target_meter_label = tb.Label(target_sessions_frame, text="Target Focus", font=("poppins", 12))
+        self.focus_target_meter_label2 = tb.Label(target_sessions_frame, text="Sessions", font=("poppins", 12))
+        self.focus_target_meter_label.pack(pady=(0, 0))
+        self.focus_target_meter_label2.pack(pady=(0, 0))
+
+        tb.Separator(self.focus_progress_target_frame, orient='vertical').pack(side="left", fill="y", padx=(35, 0))
+
+        target_time_frame = tb.Frame(self.focus_progress_target_frame)
+        target_time_frame.pack(side="right")
+
+        self.target_min_meter = tb.Meter(target_time_frame,
+                                         bootstyle="warning",
+                                         metersize=100,
+                                         padding=5,
+                                         amounttotal=300,
+                                         amountused=120,
+                                         metertype="semi",
+                                         subtext="120/300",
+                                         meterthickness=15,
+                                         showtext=False,
+                                         interactive=True)
+        self.target_min_meter.pack()
+        self.target_min_meter_label = tb.Label(target_time_frame, text="Target Focus", font=("poppins", 12))
+        self.target_min_meter_label2 = tb.Label(target_time_frame, text="Minutes", font=("poppins", 12))
+        self.target_min_meter_label.pack()
+        self.target_min_meter_label2.pack()
+
+        self.reset_progress_button = tb.Button(self.progress_tab, text="Reset Today Progress",
+                                               bootstyle="danger-outline", cursor="hand2", command=self.reset_progress, takefocus=False)
+        self.reset_progress_button.pack(pady=(12,0))
+
+    def reset_progress(self):
+        if tk.messagebox.askyesno("Reset Progress", "Are you sure you want to reset today's progress?"):
+            tk.messagebox.askyesno("Reset Progress",
+                                   "Reset Today Progress?")
+
     def on_browse(self):
         """Callback for directory browse"""
         path = filedialog.askopenfilename(title="Select an MP3 File", filetypes=[("MP3 Files", "*.mp3")])
