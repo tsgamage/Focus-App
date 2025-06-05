@@ -1,18 +1,12 @@
-from idlelib.debugger_r import frametable
-from tkinter.ttk import Style
-
 import ttkbootstrap as tb
-from ttkbootstrap.constants import *
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-import pathlib
 import os
-
 
 class FocusApp(tb.Window):
     def __init__(self):
-        super().__init__(themename='superhero')
+        super().__init__()
 
         self.app_icon_path = "./assets/icon/Focus.png"
         app_icon = tk.PhotoImage(file=self.app_icon_path)
@@ -20,18 +14,18 @@ class FocusApp(tb.Window):
         self.timer_started = False
         self.timer = None
         self.minimized = False
-        self.users_working_min = 0
-        self.users_short_break_min = 0
-        self.users_long_break_min = 0
 
-        self.WORK_MIN = 5
-        self.SHORT_BREAK_MIN = 3
-        self.LONG_BREAK_MIN = 7
+        self.sound_file_path_var = tb.StringVar()
+        self.users_target_focus_periods = tb.IntVar()
+        self.users_focus_time = tb.IntVar()
+        self.users_short_break_time = tb.IntVar()
+        self.users_long_break_time = tb.IntVar()
+        self.play_session_sound_tick = tb.BooleanVar()
+        self.minimize_to_tray_tick = tb.BooleanVar()
 
-        # Timing in seconds
-        self.WORKING_TIME_SEC = self.WORK_MIN
-        self.SMALL_BREAK_SEC = self.SHORT_BREAK_MIN
-        self.LONG_BREAK_SEC = self.LONG_BREAK_MIN
+
+        self.app_theme_name = tk.StringVar()
+        self.app_theme_name.set("superhero")
 
         self.title("Focus App")
         self.geometry("350x480")
@@ -39,6 +33,7 @@ class FocusApp(tb.Window):
         self.iconphoto(True, app_icon)
         self.resizable(False, False)
         # self.eval('tk::PlaceWindow . center')
+        self.style.theme_use(self.app_theme_name.get())
 
         self.notebook = tb.Notebook()
         self.notebook.grid(row=0, column=0, sticky='nsew', padx=0, pady=0)
@@ -83,27 +78,23 @@ class FocusApp(tb.Window):
         self.timer_label = tb.Label(master=self.main_tab, text="25:00", font=("poppins", 22), bootstyle="primary")
         self.timer_label.grid(row=2, column=0, columnspan=2)
 
-        self.sound_tick_value = tb.StringVar()
-        self.sound_tick_value.set("1")
-
+        self.play_session_sound_tick.set(True)
         self.sound_tick = tb.Checkbutton(
             master=self.main_tab,
             text="Play Session Sound",
             bootstyle="primary-round-toggle",
             cursor="hand2",
-            variable=self.sound_tick_value
+            variable=self.play_session_sound_tick
         )
         self.sound_tick.grid(row=3, column=0)
 
-        self.minimize_to_tray_value = tb.StringVar()
-        self.minimize_to_tray_value.set("1")
-
+        self.minimize_to_tray_tick.set(True)
         self.minimize_to_tray = tb.Checkbutton(
             master=self.main_tab,
             text="Minimize to Taskbar",
             bootstyle="primary-round-toggle",
             cursor="hand2",
-            variable=self.minimize_to_tray_value
+            variable=self.minimize_to_tray_tick
         )
         self.minimize_to_tray.grid(row=3, column=1)
 
@@ -138,19 +129,16 @@ class FocusApp(tb.Window):
 
         #     ---------------------------- PROGRESS TAB ----------------------------
 
-        self.focus_progress_today_frame = tb.LabelFrame(self.progress_tab, text="  Focus Progress Today  ",
-                                                        padding=10)
+        self.focus_progress_today_frame = tb.LabelFrame(self.progress_tab, text="  Focus Progress Today  ", padding=10)
         self.focus_progress_today_frame.pack(fill="x", padx=0, pady=0)
 
         # Create a frame for the first line
         first_line_frame = tb.Frame(self.focus_progress_today_frame)
         first_line_frame.pack(fill="x", pady=2)
 
-        self.focus_sessions_today_label = tb.Label(first_line_frame, text="Total Focus Sessions  :",
-                                                   font=("poppins", 12))
+        self.focus_sessions_today_label = tb.Label(first_line_frame, text="Total Focus Sessions  :", font=("poppins", 12))
         self.focus_sessions_today_label.pack(side="left")
-        self.focus_sessions_today_value = tb.Label(first_line_frame, text="9", font=("poppins", 12),
-                                                   bootstyle="success")
+        self.focus_sessions_today_value = tb.Label(first_line_frame, text="9", font=("poppins", 12), bootstyle="success")
         self.focus_sessions_today_value.pack(side="right")
 
         # Create a frame for the second line
@@ -159,39 +147,36 @@ class FocusApp(tb.Window):
 
         self.total_focus_minutes = tb.Label(second_line_frame, text="Total Focus Time         :", font=("poppins", 12))
         self.total_focus_minutes.pack(side="left")
-        self.total_focus_minutes_value = tb.Label(second_line_frame, text="9h & 44min", font=("poppins", 12),
-                                                  bootstyle="success")
+        self.total_focus_minutes_value = tb.Label(second_line_frame, text="9h & 44min", font=("poppins", 12), bootstyle="success")
         self.total_focus_minutes_value.pack(side="right")
 
         # Create a frame for the third line
         third_line_frame = tb.Frame(self.focus_progress_today_frame)
         third_line_frame.pack(fill="x", pady=2)
 
-        self.total_breaks_today_label = tb.Label(third_line_frame, text="Total Break Time         :",
-                                                 font=("poppins", 12))
+        self.total_breaks_today_label = tb.Label(third_line_frame, text="Total Break Time         :", font=("poppins", 12))
         self.total_breaks_today_label.pack(side="left")
-        self.total_breaks_today_value = tb.Label(third_line_frame, text="1h & 44min", font=("poppins", 12),
-                                                 bootstyle="warning")
+        self.total_breaks_today_value = tb.Label(third_line_frame, text="1h & 44min", font=("poppins", 12), bootstyle="warning")
         self.total_breaks_today_value.pack(side="right")
 
-        self.focus_progress_target_frame = tb.LabelFrame(self.progress_tab, text="  Focus Target  ",
-                                                         padding=10, )
+        self.focus_progress_target_frame = tb.LabelFrame(self.progress_tab, text="  Focus Target  ", padding=10, )
         self.focus_progress_target_frame.pack(fill="x", padx=0, pady=(8, 0))
 
         target_sessions_frame = tb.Frame(self.focus_progress_target_frame)
         target_sessions_frame.pack(side="left")
 
         self.focus_target_meter = tb.Meter(target_sessions_frame,
-                                           bootstyle="success",
-                                           metersize=100,
-                                           padding=5,
-                                           amounttotal=10,
-                                           amountused=8,
-                                           metertype="semi",
-                                           subtext="8/10",
-                                           meterthickness=15,
-                                           showtext=False,
-                                           interactive=True)
+            bootstyle="success",
+            metersize=100,
+            padding=5,
+            amounttotal=10,
+            amountused=8,
+            metertype="semi",
+            subtext="8/10",
+            meterthickness=15,
+            showtext=False,
+            interactive=True
+        )
         self.focus_target_meter.pack()
         self.focus_target_meter_label = tb.Label(target_sessions_frame, text="Target Focus", font=("poppins", 12))
         self.focus_target_meter_label2 = tb.Label(target_sessions_frame, text="Sessions", font=("poppins", 12))
@@ -204,25 +189,25 @@ class FocusApp(tb.Window):
         target_time_frame.pack(side="right")
 
         self.target_min_meter = tb.Meter(target_time_frame,
-                                         bootstyle="warning",
-                                         metersize=100,
-                                         padding=5,
-                                         amounttotal=300,
-                                         amountused=120,
-                                         metertype="semi",
-                                         subtext="120/300",
-                                         meterthickness=15,
-                                         showtext=False,
-                                         interactive=True)
+            bootstyle="warning",
+            metersize=100,
+            padding=5,
+            amounttotal=300,
+            amountused=120,
+            metertype="semi",
+            subtext="120/300",
+            meterthickness=15,
+            showtext=False,
+            interactive=True
+        )
         self.target_min_meter.pack()
         self.target_min_meter_label = tb.Label(target_time_frame, text="Target Focus", font=("poppins", 12))
         self.target_min_meter_label2 = tb.Label(target_time_frame, text="Minutes", font=("poppins", 12))
         self.target_min_meter_label.pack()
         self.target_min_meter_label2.pack()
 
-        self.reset_progress_button = tb.Button(self.progress_tab, text="Reset Today Progress",
-                                               bootstyle="danger-outline", cursor="hand2", command=self.reset_progress, takefocus=False)
-        self.reset_progress_button.pack(pady=(12,0))
+        self.reset_progress_button = tb.Button(self.progress_tab, text="Reset Today Progress", bootstyle="danger-outline", cursor="hand2", command=self.reset_progress, takefocus=False)
+        self.reset_progress_button.pack(pady=(12, 0))
 
     def reset_progress(self):
         if tk.messagebox.askyesno("Reset Progress", "Are you sure you want to reset today's progress?"):
@@ -233,16 +218,18 @@ class FocusApp(tb.Window):
         """Callback for directory browse"""
         path = filedialog.askopenfilename(title="Select an MP3 File", filetypes=[("MP3 Files", "*.mp3")])
         if path:
-            self.entry_var.set(path)
+            self.sound_file_path_var.set(path)
 
         os.startfile(path)
 
     def open_settings(self):
         settings_win = tb.Toplevel()
         settings_win.title("Settings")
-        settings_win.geometry("300x350")
-        settings_win.configure(pady=10, padx=10)
+        settings_win.geometry("300x450")
+        settings_win.configure(pady=15, padx=10)
         settings_win.resizable(False, False)
+        settings_win.grid_columnconfigure(0, weight=1)
+        settings_win.grid_rowconfigure(0, weight=1)
 
         # Centering the window
         self.update_idletasks()  # Make sure the main window is fully rendered
@@ -252,7 +239,7 @@ class FocusApp(tb.Window):
         main_height = self.winfo_height()
 
         win_width = 300
-        win_height = 350
+        win_height = 430
         pos_x = x + (main_width // 2) - (win_width // 2)
         pos_y = y + (main_height // 2) - (win_height // 2)
 
@@ -265,56 +252,65 @@ class FocusApp(tb.Window):
 
         # override close (X) button behavior
         def on_close():
-            # You can put validation logic here before allowing it to close
             if tk.messagebox.askyesno("Exit", "Close without saving?"):
                 settings_win.destroy()
 
         settings_win.protocol("WM_DELETE_WINDOW", on_close)
 
-        settings_win.grid_columnconfigure(0, weight=1)
-        settings_win.grid_rowconfigure(0, weight=1)
+        #  Frame for users targets ----------------
+        users_targets_frame = tb.Labelframe(settings_win, text="  Enter your Targets per day  ", padding=(10, 10))
+        users_targets_frame.pack(fill="x", pady=(0, 10))
 
-        session_sound_label_frame = tb.LabelFrame(settings_win, text="  Set custom session changing sound  ",
-                                                  padding=(10, 5))
-        session_sound_label_frame.pack(fill="x", pady=(0, 10))
+        self.users_target_focus_periods.set(10)
+        tb.Label(users_targets_frame, text="Target Focus Periods per day :").pack(side="left")
+        tb.Spinbox(users_targets_frame,textvariable= self.users_target_focus_periods, from_=0, to=10, width=2, state="readonly").pack(side="right")
 
-        self.entry_var = tk.StringVar()
-        tb.Entry(session_sound_label_frame, textvariable=self.entry_var, width=27).grid(row=1, column=0, pady=(5),
-                                                                                        padx=(0, 10))
-        tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).grid(row=1,
-                                                                                                                  column=1)
-
+        # Frame for custom timer inputs ----------------
         custom_timer_input_frame = tb.Labelframe(settings_win, text="  Enter times in minutes  ", padding=(10, 5))
         custom_timer_input_frame.pack(fill="x", pady=(0, 10))
 
-        tb.Label(custom_timer_input_frame, text="Focus Time           :").grid(row=0, column=0, padx=(0, 20),
-                                                                               pady=(0, 10))
-        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10, state="readonly").grid(row=0, column=1,
-                                                                                               pady=(0, 10))
-        tb.Label(custom_timer_input_frame, text="min").grid(row=0, column=2, pady=(0, 10))
+        # First line - Focus Time
+        focus_line = tb.Frame(custom_timer_input_frame)
+        focus_line.pack(fill="x", pady=2)
 
-        tb.Label(custom_timer_input_frame, text="Short Break Time :").grid(row=1, column=0, padx=(0, 20), pady=(0, 10))
-        tb.Spinbox(custom_timer_input_frame, from_=0, to=30, width=10, state="readonly").grid(row=1, column=1,
-                                                                                              pady=(0, 10))
-        tb.Label(custom_timer_input_frame, text="min").grid(row=1, column=2, pady=(0, 10))
+        self.users_focus_time.set(25)
+        tb.Label(focus_line, text="Focus Time in minutes :").pack(side="left")
+        tb.Spinbox(focus_line,textvariable= self.users_focus_time, from_=0, to=120, width=5, state="readonly").pack(side="right")
 
-        tb.Label(custom_timer_input_frame, text="Long Break Time  :").grid(row=2, column=0, padx=(0, 20), pady=(0, 10))
-        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10, state="readonly").grid(row=2, column=1,
-                                                                                               pady=(0, 10))
-        tb.Label(custom_timer_input_frame, text="min").grid(row=2, column=2, pady=(0, 10))
+        # Second line - Short Break Time
+        short_break_line = tb.Frame(custom_timer_input_frame)
+        short_break_line.pack(fill="x", pady=2)
 
-        app_theme_change_frame = tb.Labelframe(settings_win, text="  Change application theme  ", padding=(10, 5))
-        app_theme_change_frame.pack(fill="x", pady=(0, 10))
+        self.users_short_break_time.set(5)
+        tb.Label(short_break_line, text="Short Break Time in minutes :").pack(side="left")
+        tb.Spinbox(short_break_line,textvariable= self.users_short_break_time, from_=0, to=15, width=5, state="readonly").pack(side="right")
 
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="primary", width=10, text="Blue").grid(row=0,
-                                                                                                           column=0,
-                                                                                                           padx=(0,
-                                                                                                                 5))
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=9, text="Dark").grid(row=0, column=1,
-                                                                                                       padx=(0, 5))
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White").grid(row=0,
-                                                                                                          column=2)
+        # Third line - Long Break Time
+        long_break_line = tb.Frame(custom_timer_input_frame)
+        long_break_line.pack(fill="x", pady=2)
 
-        tb.Button(settings_win, cursor="hand2", bootstyle="success", text="Save Changes", command=settings_win.destroy,
-                  width=40).pack(
-            fill="x")
+        self.users_long_break_time.set(20)
+        tb.Label(long_break_line, text="Long Break Time in minutes :").pack(side="left")
+        tb.Spinbox(long_break_line,textvariable= self.users_long_break_time, from_=0, to=30, width=5, state="readonly").pack(side="right")
+
+        # Frame for the sound browse button ----------------
+        session_sound_label_frame = tb.LabelFrame(settings_win, text="  Set custom session changing sound  ",padding=(10, 10))
+        session_sound_label_frame.pack(fill="x", pady=(0, 10))
+
+        self.sound_file_path_var.set("No custom sound set")
+        tb.Entry(session_sound_label_frame, textvariable=self.sound_file_path_var, width=27, state="readonly").pack(side="left")
+        tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).pack(side="right")
+
+        # Frame for change app theme ----------------
+        app_theme_change_frame = tb.Labelframe(settings_win, text="  Change application theme  ", padding=(10, 10))
+        app_theme_change_frame.pack(fill="x", pady=(0, 15))
+
+        def change_app_theme(theme):
+            self.app_theme_name.set(theme)
+            self.style.theme_use(self.app_theme_name.get())
+
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="primary", width=10, text="Blue", command=lambda : change_app_theme("superhero")).grid(row=0,column=0,padx=(0, 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : change_app_theme("flatly")).grid(row=0,column=2)
+
+        tb.Button(settings_win, cursor="hand2", bootstyle="success", text="Save Changes",command=settings_win.destroy).pack(fill="x")
