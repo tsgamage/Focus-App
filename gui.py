@@ -1,3 +1,6 @@
+from idlelib.debugger_r import frametable
+from tkinter.ttk import Style
+
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 import tkinter as tk
@@ -31,7 +34,7 @@ class FocusApp(tb.Window):
         self.LONG_BREAK_SEC = self.LONG_BREAK_MIN
 
         self.title("Focus App")
-        self.geometry("350x500")
+        self.geometry("350x480")
         self.iconphoto(False, app_icon)
         self.iconphoto(True, app_icon)
         self.resizable(False, False)
@@ -43,15 +46,17 @@ class FocusApp(tb.Window):
         self.grid_columnconfigure(0, weight=1)
 
         self.main_tab = tb.Frame(self.notebook)
-        self.stats_tab = tb.Frame(self.notebook)
+        self.progress_tab = tb.Frame(self.notebook)
 
         self.notebook.add(self.main_tab, text=f"{' ' * 16}Focus Zone{' ' * 16}", padding=20)
-        self.notebook.add(self.stats_tab, text=f"{' ' * 18}Progress{' ' * 20}", padding=20)
+        self.notebook.add(self.progress_tab, text=f"{' ' * 18}Progress{' ' * 20}", padding=20)
 
         self.main_tab.grid_columnconfigure(0, weight=1)
         self.main_tab.grid_columnconfigure(1, weight=1)
-        self.stats_tab.grid_columnconfigure(0, weight=1)
-        self.stats_tab.grid_columnconfigure(1, weight=1)
+        self.progress_tab.grid_columnconfigure(0, weight=1)
+        self.progress_tab.grid_columnconfigure(1, weight=1)
+
+        #     ---------------------------- MAIN TAB ----------------------------
 
         self.header_text = tb.Label(master=self.main_tab, text="Focus App", font=("montserrat", 26))
         self.header_text.grid(row=0, column=0, columnspan=2, )
@@ -61,7 +66,7 @@ class FocusApp(tb.Window):
 
         self.meter = tb.Meter(
             master=self.main_tab,
-            bootstyle="success",
+            bootstyle="primary",
             metersize=220,
             padding=5,
             amounttotal=100,
@@ -108,7 +113,7 @@ class FocusApp(tb.Window):
             width=22,
             bootstyle="danger",
             cursor="hand2",
-            state="disabled"
+            # state="disabled"
         )
         self.reset_button.grid(row=4, column=0, pady=(20, 0), padx=(0, 10))
 
@@ -269,7 +274,7 @@ class FocusApp(tb.Window):
         settings_win.grid_columnconfigure(0, weight=1)
         settings_win.grid_rowconfigure(0, weight=1)
 
-        session_sound_label_frame = tb.LabelFrame(settings_win, text="Set custom session changing sound",
+        session_sound_label_frame = tb.LabelFrame(settings_win, text="  Set custom session changing sound  ",
                                                   padding=(10, 5))
         session_sound_label_frame.pack(fill="x", pady=(0, 10))
 
@@ -279,23 +284,26 @@ class FocusApp(tb.Window):
         tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).grid(row=1,
                                                                                                                   column=1)
 
-        custom_timer_input_frame = tb.Labelframe(settings_win, text="Enter times in minutes", padding=(10, 5))
+        custom_timer_input_frame = tb.Labelframe(settings_win, text="  Enter times in minutes  ", padding=(10, 5))
         custom_timer_input_frame.pack(fill="x", pady=(0, 10))
 
         tb.Label(custom_timer_input_frame, text="Focus Time           :").grid(row=0, column=0, padx=(0, 20),
                                                                                pady=(0, 10))
-        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10).grid(row=0, column=1, pady=(0, 10))
+        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10, state="readonly").grid(row=0, column=1,
+                                                                                               pady=(0, 10))
         tb.Label(custom_timer_input_frame, text="min").grid(row=0, column=2, pady=(0, 10))
 
         tb.Label(custom_timer_input_frame, text="Short Break Time :").grid(row=1, column=0, padx=(0, 20), pady=(0, 10))
-        tb.Spinbox(custom_timer_input_frame, from_=0, to=30, width=10).grid(row=1, column=1, pady=(0, 10))
+        tb.Spinbox(custom_timer_input_frame, from_=0, to=30, width=10, state="readonly").grid(row=1, column=1,
+                                                                                              pady=(0, 10))
         tb.Label(custom_timer_input_frame, text="min").grid(row=1, column=2, pady=(0, 10))
 
         tb.Label(custom_timer_input_frame, text="Long Break Time  :").grid(row=2, column=0, padx=(0, 20), pady=(0, 10))
-        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10, ).grid(row=2, column=1, pady=(0, 10))
+        tb.Spinbox(custom_timer_input_frame, from_=0, to=120, width=10, state="readonly").grid(row=2, column=1,
+                                                                                               pady=(0, 10))
         tb.Label(custom_timer_input_frame, text="min").grid(row=2, column=2, pady=(0, 10))
 
-        app_theme_change_frame = tb.Labelframe(settings_win, text="Change application theme", padding=(10, 5))
+        app_theme_change_frame = tb.Labelframe(settings_win, text="  Change application theme  ", padding=(10, 5))
         app_theme_change_frame.pack(fill="x", pady=(0, 10))
 
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="primary", width=10, text="Blue").grid(row=0,
