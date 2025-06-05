@@ -1,4 +1,4 @@
-from gui import FocusApp
+from focus import FocusApp
 
 if __name__ == "__main__":
     app = FocusApp()

@@ -1,5 +1,5 @@
 from ttkbootstrap.toast import ToastNotification
-from gui import FocusApp
+from ui import FocusApp
 import math
 import pystray
 from pystray import MenuItem as item
@@ -183,7 +183,6 @@ def handle_start_pause_button():
         start_session()
 
 def hide_window():
-
     def quit_window(icon, item):
         icon.stop()
         # app.destroy()
@@ -206,7 +205,7 @@ def hide_window():
         toast.show_toast()
 
     app.withdraw()
-    image = Image.open("./assets/icon/Focus.png")
+    image = Image.open("../assets/icons/Focus.png")
     menu = (item("Restore", show_window, default=True),item("About", show_about), item('Quit', quit_window))
     icon = pystray.Icon("Focus", image, "Focus App", menu)
     threading.Thread(target=icon.run).start()
