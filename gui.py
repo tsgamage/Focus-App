@@ -107,18 +107,20 @@ class FocusApp(tb.Window):
             width=8,
             bootstyle="warning",
             cursor="hand2",
+            state="disabled"
         )
-        self.skip_button.grid(row=0, column=0)
+        self.skip_button.grid(row=0, column=0, padx=(0, 7))
 
-        self.reset_timer = tb.Button(
+        self.reset_timer_button = tb.Button(
             master=reset_btn_frame,
             text="Reset Timer",
             cursor="hand2",
             takefocus=False,
             bootstyle="danger",
-            width=23,
+            width=21,
+            state="disabled"
         )
-        self.reset_timer.grid(row=0, column=1)
+        self.reset_timer_button.grid(row=0, column=1)
 
         self.settings_button = tb.Button(
             master=reset_btn_frame,
@@ -128,7 +130,7 @@ class FocusApp(tb.Window):
             cursor="hand2",
             command=self.open_settings
         )
-        self.settings_button.grid(row=0, column=2)
+        self.settings_button.grid(row=0, column=2, padx=(7, 0))
 
         self.start_pause_button = tb.Button(
             master=self.main_tab,
@@ -143,8 +145,8 @@ class FocusApp(tb.Window):
         tb.Separator(self.main_tab, orient='horizontal').grid(row=6, column=0, columnspan=2, pady=(10, 2), sticky="ew")
 
 
-        self.bottom_text = tb.Label(master=self.main_tab,text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
-        self.bottom_text.grid(row=7, column=0, columnspan=2)
+        self.main_bottom_text = tb.Label(master=self.main_tab,text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
+        self.main_bottom_text.grid(row=7, column=0, columnspan=2)
 
         #     ---------------------------- PROGRESS TAB ----------------------------
 
@@ -231,8 +233,8 @@ class FocusApp(tb.Window):
 
         tb.Separator(self.progress_tab, orient='horizontal').pack( fill="x", pady=(10, 2))
 
-        self.bottom_text = tb.Label(master=self.progress_tab, text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
-        self.bottom_text.pack()
+        self.progress_bottom_text = tb.Label(master=self.progress_tab, text="Only 3 more sessions to for a long break", font=("poppins", 10), bootstyle="info")
+        self.progress_bottom_text.pack()
 
     def reset_progress(self):
         if tk.messagebox.askyesno("Reset Progress", "Are you sure you want to reset today's progress?"):
