@@ -1,4 +1,6 @@
-from focus import FocusApp, Sessions
+from .ui import FocusApp
+from .core import Sessions
+from .settings import FocusSettings
 
 #  These all for the tray icon
 from ttkbootstrap.toast import ToastNotification
@@ -7,14 +9,21 @@ from pystray import MenuItem
 from PIL import Image
 import threading
 
-class FocusController(FocusApp, Sessions):
+class FocusController(FocusApp, Sessions, FocusSettings):
     def __init__(self):
         FocusApp.__init__(self)
+        FocusSettings.__init__(self)
         Sessions.__init__(self, self)
 
         self.is_minimized = False
         self.window_bottom_text = "Only 3 more sessions to for a long break."
-        self.link_buttons()
+        self.after(1000, self.link_buttons)
+
+    def link_buttons(self):
+        self.bind("<Unmap>",self.on_minimize)
+        self.start_pause_button.configure(command=self.handle_start_pause_button)
+        self.skip_button.configure(command=self.skip_session)
+        self.reset_timer_button.configure(command=self.reset_timer)
 
     def pause_session(self):
         self.after_cancel(self.timer)
@@ -107,9 +116,7 @@ class FocusController(FocusApp, Sessions):
                 self.is_minimized = True
                 self.hide_window()
 
-
-    def link_buttons(self):
-        self.bind("<Unmap>",self.on_minimize)
-        self.start_pause_button.configure(command=self.handle_start_pause_button)
-        self.skip_button.configure(command=self.skip_session)
-        self.reset_timer_button.configure(command=self.reset_timer)
+    def _on_settings_save(self):
+        super()._on_settings_save()
+        self.save_settings(self.user_settings)
+        print(f"saved settings: {self.user_settings}")

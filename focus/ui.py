@@ -13,6 +13,7 @@ class FocusApp(tb.Window):
         self.loop_time = 0
         self.timer_started = False
         self.minimized = False
+        self.user_settings:dict = {}
 
         self.sound_file_path_var = tb.StringVar()
         self.users_target_focus_periods = tb.IntVar()
@@ -33,6 +34,7 @@ class FocusApp(tb.Window):
         self.resizable(False, False)
         # self.eval('tk::PlaceWindow . center')
         self.style.theme_use(self.app_theme_name.get())
+        self.settings_window = None
 
         self.notebook = tb.Notebook()
         self.notebook.grid(row=0, column=0, sticky='nsew', padx=0, pady=0)
@@ -247,13 +249,13 @@ class FocusApp(tb.Window):
         os.startfile(path)
 
     def open_settings(self):
-        settings_win = tb.Toplevel()
-        settings_win.title("Settings")
-        settings_win.geometry("300x450")
-        settings_win.configure(pady=15, padx=10)
-        settings_win.resizable(False, False)
-        settings_win.grid_columnconfigure(0, weight=1)
-        settings_win.grid_rowconfigure(0, weight=1)
+        self.settings_window = tb.Toplevel()
+        self.settings_window.title("Settings")
+        self.settings_window.geometry("300x450")
+        self.settings_window.configure(pady=15, padx=10)
+        self.settings_window.resizable(False, False)
+        self.settings_window.grid_columnconfigure(0, weight=1)
+        self.settings_window.grid_rowconfigure(0, weight=1)
 
         # Centering the window
         self.update_idletasks()  # Make sure the main window is fully rendered
@@ -267,37 +269,35 @@ class FocusApp(tb.Window):
         pos_x = x + (main_width // 2) - (win_width // 2)
         pos_y = y + (main_height // 2) - (win_height // 2)
 
-        settings_win.geometry(f"{win_width}x{win_height}+{pos_x}+{pos_y}")
+        self.settings_window.geometry(f"{win_width}x{win_height}+{pos_x}+{pos_y}")
 
         # Make it modal
-        settings_win.grab_set()  # Prevents clicking on other windows
-        settings_win.transient(self)  # Tells OS it's a child of your main app
-        settings_win.focus()  # Focus on it automatically
+        self.settings_window.grab_set()  # Prevents clicking on other windows
+        self.settings_window.transient(self)  # Tells OS it's a child of your main app
+        self.settings_window.focus()  # Focus on it automatically
 
         # override close (X) button behavior
         def on_close():
             if tk.messagebox.askyesno("Exit", "Close without saving?"):
-                settings_win.destroy()
+                self.settings_window.destroy()
 
-        settings_win.protocol("WM_DELETE_WINDOW", on_close)
+        self.settings_window.protocol("WM_DELETE_WINDOW", on_close)
 
         #  Frame for users targets ----------------
-        users_targets_frame = tb.Labelframe(settings_win, text="  Enter your Targets per day  ", padding=(10, 10))
+        users_targets_frame = tb.Labelframe(self.settings_window, text="  Enter your Targets per day  ", padding=(10, 10))
         users_targets_frame.pack(fill="x", pady=(0, 10))
 
-        self.users_target_focus_periods.set(10)
         tb.Label(users_targets_frame, text="Target Focus Periods per day :").pack(side="left")
         tb.Spinbox(users_targets_frame,textvariable= self.users_target_focus_periods, from_=0, to=10, width=2, state="readonly").pack(side="right")
 
         # Frame for custom timer inputs ----------------
-        custom_timer_input_frame = tb.Labelframe(settings_win, text="  Enter times in minutes  ", padding=(10, 5))
+        custom_timer_input_frame = tb.Labelframe(self.settings_window, text="  Enter times in minutes  ", padding=(10, 5))
         custom_timer_input_frame.pack(fill="x", pady=(0, 10))
 
         # First line - Focus Time
         focus_line = tb.Frame(custom_timer_input_frame)
         focus_line.pack(fill="x", pady=2)
 
-        self.users_focus_time.set(25)
         tb.Label(focus_line, text="Focus Time in minutes :").pack(side="left")
         tb.Spinbox(focus_line,textvariable= self.users_focus_time, from_=0, to=120, width=5, state="readonly").pack(side="right")
 
@@ -305,7 +305,6 @@ class FocusApp(tb.Window):
         short_break_line = tb.Frame(custom_timer_input_frame)
         short_break_line.pack(fill="x", pady=2)
 
-        self.users_short_break_time.set(5)
         tb.Label(short_break_line, text="Short Break Time in minutes :").pack(side="left")
         tb.Spinbox(short_break_line,textvariable= self.users_short_break_time, from_=0, to=15, width=5, state="readonly").pack(side="right")
 
@@ -313,12 +312,11 @@ class FocusApp(tb.Window):
         long_break_line = tb.Frame(custom_timer_input_frame)
         long_break_line.pack(fill="x", pady=2)
 
-        self.users_long_break_time.set(20)
         tb.Label(long_break_line, text="Long Break Time in minutes :").pack(side="left")
         tb.Spinbox(long_break_line,textvariable= self.users_long_break_time, from_=0, to=30, width=5, state="readonly").pack(side="right")
 
         # Frame for the sound browse button ----------------
-        session_sound_label_frame = tb.LabelFrame(settings_win, text="  Set custom session changing sound  ",padding=(10, 10))
+        session_sound_label_frame = tb.LabelFrame(self.settings_window, text="  Set custom session changing sound  ",padding=(10, 10))
         session_sound_label_frame.pack(fill="x", pady=(0, 10))
 
         self.sound_file_path_var.set("No custom sound set")
@@ -326,18 +324,21 @@ class FocusApp(tb.Window):
         tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).pack(side="right")
 
         # Frame for change app theme ----------------
-        app_theme_change_frame = tb.Labelframe(settings_win, text="  Change application theme  ", padding=(10, 10))
+        app_theme_change_frame = tb.Labelframe(self.settings_window, text="  Change application theme  ", padding=(10, 10))
         app_theme_change_frame.pack(fill="x", pady=(0, 15))
 
-        def change_app_theme(theme):
-            self.app_theme_name.set(theme)
-            self.style.theme_use(self.app_theme_name.get())
 
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="info", width=10, text="Blue", command=lambda : change_app_theme("superhero")).grid(row=0,column=0,padx=(0, 5))
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
-        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : change_app_theme("flatly")).grid(row=0,column=2)
 
-        tb.Button(settings_win, cursor="hand2", bootstyle="success", text="Save Changes",command=settings_win.destroy).pack(fill="x")
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="info", width=10, text="Blue", command=lambda : self.change_app_theme("superhero")).grid(row=0,column=0,padx=(0, 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : self.change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
+        tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : self.change_app_theme("flatly")).grid(row=0,column=2)
+
+        self.settings_save_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="success", text="Save Changes",command=self._on_settings_save, takefocus=False)
+        self.settings_save_btn.pack(fill="x")
+
+    def change_app_theme(self, theme):
+        self.app_theme_name.set(theme)
+        self.style.theme_use(self.app_theme_name.get())
 
     def update_ui_timer(self, formated_time:str):
         """Update the timer label"""
@@ -363,3 +364,18 @@ class FocusApp(tb.Window):
         """Update the meter in the main tab"""
         # self.update_timer_color(amount_used)
         self.main_meter.configure(amountused=amount_used)
+
+    def _on_settings_save(self):
+        # This function will be overwritten by the controller
+        self.user_settings = {
+                "user": {
+                    "theme": self.app_theme_name.get(),  # from a ttkbootstrap StringVar
+                    "target_sessions": int(self.users_target_focus_periods.get()),
+                    "focus_time": int(self.users_focus_time.get()),
+                    "short_break_time": int(self.users_short_break_time.get()),
+                    "long_break_time": int(self.users_long_break_time.get()),
+                }
+            }
+        if tk.messagebox.showinfo("Settings Saved", "Settings saved successfully!"):
+            self.settings_window.destroy()
+
