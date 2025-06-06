@@ -101,3 +101,22 @@ class FocusSettings:
         else:
             print("Restoring Progress")
             self.load_settings()
+
+    def update_first_launch(self):
+        saved_data = self.saved_settings
+        is_first_launch = saved_data["app"]['first_launch']
+
+        if is_first_launch:
+            updated_data = saved_data
+            updated_data["app"]['first_launch'] = False
+            try:
+                with open(self.settings_file_path, "w") as settings_file:
+                    json.dump(updated_data, settings_file, indent=4)
+            except FileNotFoundError:
+                print("Error: Could not save settings.")
+                return
+            finally:
+                self.saved_settings = updated_data
+        else:
+            return
+

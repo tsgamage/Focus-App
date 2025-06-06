@@ -29,10 +29,14 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         Sessions.__init__(self, self)
 
         self.is_minimized = False
-        self.window_bottom_text = "Only 3 more sessions to for a long break."
+        self.window_bottom_text = "Press Start to start the timer."
         self.link_buttons()
         self.update_ui_settings_with_saved_settings(start=True)
         self.restore_progress_tab()
+        self.update_bottom_text()
+        self.update_first_launch()
+
+
 
     def link_buttons(self):
         self.bind("<Unmap>",self.on_minimize)
@@ -82,8 +86,8 @@ class FocusController(FocusApp, Sessions, FocusSettings):
             self.skip_button.configure(state="normal", cursor="hand2")
             self.settings_button.configure(state="normal", cursor="hand2")
 
-            self.main_bottom_text.configure(text="Paused! Press Start to continue.")
-            self.progress_bottom_text.configure(text="Paused! Press Start in Focus Zone to continue.")
+            self.window_bottom_text = "Timer Paused! Press Start to continue."
+            self.update_bottom_text()
             self.pause_session()
         else:
             self.session_started = True
@@ -96,6 +100,8 @@ class FocusController(FocusApp, Sessions, FocusSettings):
 
             self.main_bottom_text.configure(text=self.window_bottom_text)
             self.progress_bottom_text.configure(text=self.window_bottom_text)
+            self.window_bottom_text = "Timer has started!"
+            self.update_bottom_text()
             self.start_session()
 
     def hide_window(self):
@@ -197,5 +203,12 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         }
         self.save_user_settings(user_progress_data)
 
+    def update_bottom_text(self):
+        is_first_launch = self.saved_settings["app"]['first_launch']
+        if not is_first_launch:
+            self.main_bottom_text.configure(text=self.window_bottom_text)
+            self.progress_bottom_text.configure(text=self.window_bottom_text)
+
     def _running_after_every_sessions(self):
         self.update_progress_tab()
+        self.update_bottom_text()
