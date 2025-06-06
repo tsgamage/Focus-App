@@ -6,7 +6,7 @@ class FocusSettings:
     def __init__(self):
 
         self.settings_file_name = "user_config.json"
-        self.settings_file_path = f"test/{self.settings_file_name}"
+        self.settings_file_path = f"data/{self.settings_file_name}"
 
         self.folder_structure = {
             "app": {
