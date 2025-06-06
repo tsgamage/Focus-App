@@ -33,7 +33,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.after_cancel(self.timer)
 
     def skip_session(self):
-        self.current_running_seconds = 0
+        self.current_running_seconds = -1
         self.session_number += 1
         if self.session_number > 8:
             self.reset_variables()
@@ -54,7 +54,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.settings_button.configure(state="disabled", cursor="arrow")
         self.start_pause_button.configure(state="disabled", cursor="arrow")
 
-        self.current_running_seconds = 0
+        self.current_running_seconds = -1
         self.update_ui_meter(100)
         self.update_ui_timer(self.formate_time(self.session_times[f"{self.current_session}"]))
         self.main_bottom_text.configure(text="Timer has reset!.")
