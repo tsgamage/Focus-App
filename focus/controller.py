@@ -1,6 +1,9 @@
+
 from .ui import FocusApp
 from .core import Sessions
 from .settings import FocusSettings
+
+from tkinter import messagebox
 
 #  These all for the tray icon
 from ttkbootstrap.toast import ToastNotification
@@ -18,6 +21,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.is_minimized = False
         self.window_bottom_text = "Only 3 more sessions to for a long break."
         self.link_buttons()
+        self.update_ui_settings_with_saved_settings()
 
     def link_buttons(self):
         self.bind("<Unmap>",self.on_minimize)
@@ -119,3 +123,16 @@ class FocusController(FocusApp, Sessions, FocusSettings):
     def _on_settings_save(self):
         super()._on_settings_save()
         self.save_settings(self.user_settings)
+
+    def _on_settings_reset(self):
+        super()._on_settings_reset()
+        if self.reset_user_settings:
+            self.reset_settings()
+            self.update_ui_settings_with_saved_settings()
+
+    def update_ui_settings_with_saved_settings(self):
+        self.change_app_theme(self.saved_settings["user"]["theme"])
+        self.users_target_focus_periods.set(self.saved_settings["user"]["users_target_sessions"])
+        self.users_focus_time.set(self.saved_settings["user"]["users_focus_time"])
+        self.users_short_break_time.set(self.saved_settings["user"]["users_short_break_time"])
+        self.users_long_break_time.set(self.saved_settings["user"]["users_long_break_time"])
