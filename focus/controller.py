@@ -102,7 +102,6 @@ class FocusController(FocusApp, Sessions):
         threading.Thread(target=tray_icon.run).start()
 
     def on_minimize(self, event):
-        print(f"Want to minimize: {self.minimize_to_tray_tick.get()}")
         if self.minimize_to_tray_tick.get():
             if self.state() == 'iconic' and not self.is_minimized:
                 self.is_minimized = True

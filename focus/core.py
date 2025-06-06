@@ -9,7 +9,14 @@ class Sessions:
         self.current_session: str = "focus"  # Can use focus, shortB, and longB
         self.session_number: int = 1
         self.session_started: bool = False
-        self.current_running_seconds: int = 0
+
+        self.current_running_seconds: int = -1
+        """
+        Passing -1 because application checks this value to start the timer when it is 0, it will pass the if 
+        statement that checks "self.current_running_seconds >= 0" and when its zero the application thinks the 
+        timer has stopped by the user at 0 seconds so it will pass the zero as seconds. When it passes 0 as the 
+        seconds for the timer, the timer will jump to the next session immediately.
+        """
         self.formated_current_running_time: str = ''
         self.timer = ''
 
@@ -83,7 +90,7 @@ class Sessions:
             self.current_session = "longB"
 
             passing_value_for_countdown: int = self.session_times["longB"]
-            if self.current_running_seconds > 0:
+            if self.current_running_seconds >= 0:
                 passing_value_for_countdown = self.current_running_seconds
 
             self.countdown(passing_value_for_countdown, self.application)
@@ -94,7 +101,7 @@ class Sessions:
             self.current_session = "shortB"
 
             passing_value_for_countdown: int = self.session_times["shortB"]
-            if self.current_running_seconds > 0:
+            if self.current_running_seconds >= 0:
                 passing_value_for_countdown = self.current_running_seconds
             self.countdown(passing_value_for_countdown, self.application)
 
@@ -104,7 +111,7 @@ class Sessions:
             self.current_session = "focus"
 
             passing_value_for_countdown: int = self.session_times["focus"]
-            if self.current_running_seconds > 0:
+            if self.current_running_seconds >= 0:
                 passing_value_for_countdown = self.current_running_seconds
             self.countdown(passing_value_for_countdown, self.application)
 
