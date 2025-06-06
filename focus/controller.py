@@ -30,6 +30,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
 
         self.is_minimized = False
         self.window_bottom_text = "Press Start to start the timer."
+        self.get_saved_session_times()
         self.link_buttons()
         self.update_ui_settings_with_saved_settings(start=True)
         self.restore_progress_tab()
@@ -143,6 +144,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         super()._on_settings_save()
         self.save_user_settings(self.user_settings)
         self.restore_progress_tab()
+        self.get_saved_session_times()
 
     def _on_settings_reset(self):
         super()._on_settings_reset()
@@ -158,7 +160,6 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.users_long_break_time.set(self.saved_settings["user"]["users_long_break_time"])
         if start:
             self.change_app_theme(self.saved_settings["user"]["theme"])
-
 
     def restore_progress_tab(self):
         self.total_focus_sessions = self.saved_settings["user"]["total_focus_sessions_completed"]
@@ -234,3 +235,11 @@ class FocusController(FocusApp, Sessions, FocusSettings):
             self.total_long_break_sessions = 0
             self.update_progress_tab()
             self.reset_today_progress = False
+
+    def get_saved_session_times(self):
+        saved_session_times = {
+            "focus": self.saved_settings["user"]["users_focus_time"],
+            "shortB": self.saved_settings["user"]["users_short_break_time"],
+            "longB": self.saved_settings["user"]["users_long_break_time"]
+        }
+        self.session_times = saved_session_times

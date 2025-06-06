@@ -302,21 +302,21 @@ class FocusApp(tb.Window):
         focus_line.pack(fill="x", pady=2)
 
         tb.Label(focus_line, text="Focus Time in minutes :").pack(side="left")
-        tb.Spinbox(focus_line,textvariable= self.users_focus_time, from_=0, to=120, width=5, state="readonly").pack(side="right")
+        tb.Spinbox(focus_line,textvariable= self.users_focus_time, from_=15, to=120, width=5, state="readonly").pack(side="right")
 
         # Second line - Short Break Time
         short_break_line = tb.Frame(custom_timer_input_frame)
         short_break_line.pack(fill="x", pady=2)
 
         tb.Label(short_break_line, text="Short Break Time in minutes :").pack(side="left")
-        tb.Spinbox(short_break_line,textvariable= self.users_short_break_time, from_=0, to=15, width=5, state="readonly").pack(side="right")
+        tb.Spinbox(short_break_line,textvariable= self.users_short_break_time, from_=2, to=15, width=5, state="readonly").pack(side="right")
 
         # Third line - Long Break Time
         long_break_line = tb.Frame(custom_timer_input_frame)
         long_break_line.pack(fill="x", pady=2)
 
         tb.Label(long_break_line, text="Long Break Time in minutes :").pack(side="left")
-        tb.Spinbox(long_break_line,textvariable= self.users_long_break_time, from_=0, to=30, width=5, state="readonly").pack(side="right")
+        tb.Spinbox(long_break_line,textvariable= self.users_long_break_time, from_=5, to=30, width=5, state="readonly").pack(side="right")
 
         # # Frame for the sound browse button ----------------
         # session_sound_label_frame = tb.LabelFrame(self.settings_window, text="  Set custom session changing sound  ",padding=(10, 10))

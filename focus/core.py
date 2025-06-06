@@ -5,9 +5,13 @@ class Sessions:
 
         self.application = application
 
+        self.saved_session_time_in_minutes: int
+        self.saved_short_break_time_in_minutes: int
+        self.saved_long_break_time_in_minutes: int
+
         self.session_times: dict = {"focus": 6, "shortB": 3, "longB": 5}
         self.current_session: str = "focus"  # Can use focus, shortB, and longB
-        self.session_number: int = 8
+        self.session_number: int = 1
         self.session_started: bool = False
 
         self.current_running_seconds: int = -1
