@@ -26,6 +26,7 @@ class FocusApp(tb.Window):
         self.app_theme_name = tk.StringVar()
         self.app_theme_name.set("superhero")
         self.reset_user_settings = False
+        self.reset_today_progress = False
 
 
         self.title("Focus App")
@@ -227,7 +228,7 @@ class FocusApp(tb.Window):
         self.target_min_meter_label.pack()
         self.target_min_meter_label2.pack()
 
-        self.reset_progress_button = tb.Button(self.progress_tab, text="Reset Today Progress", bootstyle="danger-outline", cursor="hand2", command=self.reset_progress, takefocus=False)
+        self.reset_progress_button = tb.Button(self.progress_tab, text="Reset Today Progress", bootstyle="danger-outline", cursor="hand2", command=self.handle_reset_today_progress_click, takefocus=False)
         self.reset_progress_button.pack(pady=(12, 0))
 
 
@@ -236,18 +237,19 @@ class FocusApp(tb.Window):
         self.progress_bottom_text = tb.Label(master=self.progress_tab, text="Where Elegance Meets Logic.", font=("poppins", 10), bootstyle="info")
         self.progress_bottom_text.pack()
 
-    def reset_progress(self):
+    def handle_reset_today_progress_click(self):
         if tk.messagebox.askyesno("Reset Progress", "Are you sure you want to reset today's progress?"):
-            tk.messagebox.askyesno("Reset Progress",
-                                   "Reset Today Progress?")
+            if tk.messagebox.askyesno("Reset Progress","Reset Today Progress?"):
+                self.reset_today_progress = True
 
-    def on_browse(self):
-        """Callback for directory browse"""
-        path = filedialog.askopenfilename(title="Select an MP3 File", filetypes=[("MP3 Files", "*.mp3")])
-        if path:
-            self.sound_file_path_var.set(path)
 
-        os.startfile(path)
+    # def on_browse(self):
+    #     """Callback for directory browse"""
+    #     path = filedialog.askopenfilename(title="Select an MP3 File", filetypes=[("MP3 Files", "*.mp3")])
+    #     if path:
+    #         self.sound_file_path_var.set(path)
+    #
+    #     os.startfile(path)
 
     def open_settings(self):
         self.settings_window = tb.Toplevel()

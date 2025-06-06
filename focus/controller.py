@@ -143,6 +143,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
     def _on_settings_save(self):
         super()._on_settings_save()
         self.save_user_settings(self.user_settings)
+        self.restore_progress_tab()
 
     def _on_settings_reset(self):
         super()._on_settings_reset()
@@ -158,6 +159,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.users_long_break_time.set(self.saved_settings["user"]["users_long_break_time"])
         if start:
             self.change_app_theme(self.saved_settings["user"]["theme"])
+
 
     def restore_progress_tab(self):
         self.total_focus_sessions = self.saved_settings["user"]["total_focus_sessions_completed"]
@@ -220,3 +222,12 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         quote = random_quote()
         print(f"\n\nquote: {quote}\n\n")
         self.quote_text.configure(text=quote)
+
+    def handle_reset_today_progress_click(self):
+        super().handle_reset_today_progress_click()
+        if self.reset_today_progress:
+            self.total_focus_sessions = 0
+            self.total_short_break_sessions = 0
+            self.total_long_break_sessions = 0
+            self.update_progress_tab()
+            self.reset_today_progress = False
