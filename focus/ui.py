@@ -27,6 +27,7 @@ class FocusApp(tb.Window):
         self.app_theme_name.set("superhero")
         self.reset_user_settings = False
 
+
         self.title("Focus App")
         self.geometry("350x512")
         self.iconphoto(False, app_icon)
@@ -66,7 +67,7 @@ class FocusApp(tb.Window):
             metersize=220,
             padding=5,
             amounttotal=100,
-            amountused=0,
+            amountused=100,
             metertype="semi",
             # subtext="miles per hour",
             meterthickness=20,
@@ -333,8 +334,8 @@ class FocusApp(tb.Window):
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : self.change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : self.change_app_theme("flatly")).grid(row=0,column=2)
 
-        self.reset_settings_to_default_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="danger-outline", text="Reset all settings to defaults",command=self._on_settings_reset, takefocus=False).pack(fill="x", pady=(0, 10))
-        self.settings_save_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="success", text="Save Changes",command=self._on_settings_save, takefocus=False).pack(fill="x")
+        tb.Button(self.settings_window, cursor="hand2", bootstyle="danger-outline", text="Reset all settings to defaults",command=self._on_settings_reset, takefocus=False).pack(fill="x", pady=(0, 10))
+        tb.Button(self.settings_window, cursor="hand2", bootstyle="success", text="Save Changes",command=self._on_settings_save, takefocus=False).pack(fill="x")
 
     def change_app_theme(self, theme):
         self.app_theme_name.set(theme)

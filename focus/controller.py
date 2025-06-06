@@ -21,7 +21,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.is_minimized = False
         self.window_bottom_text = "Only 3 more sessions to for a long break."
         self.link_buttons()
-        self.update_ui_settings_with_saved_settings()
+        self.update_ui_settings_with_saved_settings(start=True)
 
     def link_buttons(self):
         self.bind("<Unmap>",self.on_minimize)
@@ -129,10 +129,12 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         if self.reset_user_settings:
             self.reset_settings()
             self.update_ui_settings_with_saved_settings()
+            self.reset_user_settings = False
 
-    def update_ui_settings_with_saved_settings(self):
-        self.change_app_theme(self.saved_settings["user"]["theme"])
+    def update_ui_settings_with_saved_settings(self, start = False):
         self.users_target_focus_periods.set(self.saved_settings["user"]["users_target_sessions"])
         self.users_focus_time.set(self.saved_settings["user"]["users_focus_time"])
         self.users_short_break_time.set(self.saved_settings["user"]["users_short_break_time"])
         self.users_long_break_time.set(self.saved_settings["user"]["users_long_break_time"])
+        if start:
+            self.change_app_theme(self.saved_settings["user"]["theme"])
