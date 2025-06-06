@@ -12,6 +12,16 @@ from pystray import MenuItem
 from PIL import Image
 import threading
 
+def progress_times_formater(minutes:int):
+    """ Format the minutes to the time in Xh & XXmin format """
+    hours = minutes // 60
+    minutes = minutes % 60
+    if hours == 0:
+        return f"{minutes}min"
+    else:
+        return f"{hours}h & {minutes}min"
+
+
 class FocusController(FocusApp, Sessions, FocusSettings):
     def __init__(self):
         FocusApp.__init__(self)
@@ -22,6 +32,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.window_bottom_text = "Only 3 more sessions to for a long break."
         self.link_buttons()
         self.update_ui_settings_with_saved_settings(start=True)
+        self.restore_progress_tab()
 
     def link_buttons(self):
         self.bind("<Unmap>",self.on_minimize)
@@ -138,3 +149,53 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.users_long_break_time.set(self.saved_settings["user"]["users_long_break_time"])
         if start:
             self.change_app_theme(self.saved_settings["user"]["theme"])
+
+    def restore_progress_tab(self):
+        self.total_focus_sessions = self.saved_settings["user"]["total_focus_sessions_completed"]
+        self.total_short_break_sessions = self.saved_settings["user"]["total_short_breaks_got"]
+        self.total_long_break_sessions = self.saved_settings["user"]["total_long_breaks_got"]
+        self.update_progress_tab()
+
+    def update_progress_tab(self):
+        # Update total focus sessions
+        self.focus_sessions_today_value.configure(text=self.total_focus_sessions)
+
+        # update total focus time
+        focus_session_duration = self.saved_settings["user"]["users_focus_time"]
+        total_focus_duration = int(focus_session_duration) * self.total_focus_sessions
+        self.total_focus_minutes_value.configure(text=progress_times_formater(total_focus_duration))
+
+        # update total breaks time
+        short_break_session_duration = self.saved_settings["user"]["users_short_break_time"]
+        total_short_break_duration = int(short_break_session_duration) * self.total_short_break_sessions
+        long_break_session_duration = self.saved_settings["user"]["users_long_break_time"]
+        total_long_break_duration = int(long_break_session_duration) * self.total_long_break_sessions
+        total_breaks_duration = total_short_break_duration + total_long_break_duration
+        self.total_breaks_today_value.configure(text=progress_times_formater(total_breaks_duration))
+
+        # update target focus sessions meter
+        target_focus_sessions = self.saved_settings["user"]["users_target_sessions"]
+
+        self.focus_target_meter.configure(
+            amounttotal=target_focus_sessions,
+            amountused=self.total_focus_sessions if self.total_focus_sessions <= target_focus_sessions else target_focus_sessions,
+            subtext=f"{self.total_focus_sessions}/{target_focus_sessions}",
+        )
+
+        target_focus_duration = int(focus_session_duration) * target_focus_sessions
+        self.target_min_meter.configure(
+            amounttotal=target_focus_duration,
+            amountused=total_focus_duration if total_focus_duration <= int(target_focus_duration) else target_focus_duration,
+            subtext=f"{total_focus_duration}/{target_focus_duration}",
+        )
+
+
+        user_progress_data={
+            "total_focus_sessions_completed": self.total_focus_sessions,
+            "total_short_breaks_got": self.total_short_break_sessions,
+            "total_long_breaks_got": self.total_long_break_sessions
+        }
+        self.save_user_settings(user_progress_data)
+
+    def _running_after_every_sessions(self):
+        self.update_progress_tab()

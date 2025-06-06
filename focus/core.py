@@ -20,6 +20,12 @@ class Sessions:
         self.formated_current_running_time: str = ''
         self.timer = ''
 
+        self.total_focus_sessions: int = 0
+        self.total_short_break_sessions: int = 0
+        self.total_long_break_sessions: int = 0
+
+
+
     def reset_variables(self):
         self.current_running_seconds = 0
         self.session_number = 1
@@ -44,12 +50,12 @@ class Sessions:
         self.formated_current_running_time =  f"{timer_min}:{timer_sec}"
         return self.formated_current_running_time
 
-
     def countdown(self, seconds: int, application):
         """ The main core of the app. Countdown function. """
 
         self.current_running_seconds = seconds
         self.formate_time(seconds)
+        self._running_after_every_sessions()
 
         if seconds >= 0:
             print(f"seconds: {seconds}")
@@ -63,12 +69,17 @@ class Sessions:
             self.timer = application.after(1000, self.countdown, self.current_running_seconds - 1, self.application)
 
         elif self.current_running_seconds < 0:
-            print("Session over")
+            if self.current_session == "focus":
+                self.total_focus_sessions += 1
+            elif self.current_session == "shortB":
+                self.total_short_break_sessions += 1
+            elif self.current_session == "longB":
+                self.total_long_break_sessions += 1
+
             self.session_number += 1
             if self.session_number > 8:
                 self.reset_variables()
             self.start_session()
-
 
     def start_session(self):
 
@@ -116,3 +127,7 @@ class Sessions:
             self.countdown(passing_value_for_countdown, self.application)
 
             self.application.header_text.configure(text="Focus")
+
+    def _running_after_every_sessions(self):
+        # To be overwritten by controller
+        pass

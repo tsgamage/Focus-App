@@ -196,7 +196,7 @@ class FocusApp(tb.Window):
             subtext="8/10",
             meterthickness=15,
             showtext=False,
-            interactive=True
+            interactive=False
         )
         self.focus_target_meter.pack()
         self.focus_target_meter_label = tb.Label(target_sessions_frame, text="Target Focus", font=("poppins", 12))

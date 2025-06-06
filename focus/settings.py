@@ -86,6 +86,12 @@ class FocusSettings:
             try:
                 with open(self.settings_file_path, "w") as settings_file:
                     json.dump(updated_date, settings_file, indent=4)
+                reset_progress = {
+                    "total_focus_sessions_completed": 0,
+                    "total_short_breaks_got": 0,
+                    "total_long_breaks_got": 0,
+                }
+                self.save_user_settings(reset_progress)
             except FileNotFoundError:
                 print("Error: Could not save settings.")
                 return
@@ -94,3 +100,4 @@ class FocusSettings:
 
         else:
             print("Restoring Progress")
+            self.load_settings()
