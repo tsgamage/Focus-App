@@ -8,11 +8,10 @@ class FocusApp(tb.Window):
     def __init__(self):
         super().__init__()
 
-        self.app_icon_path = "../assets/icons/Focus.png"
+        self.app_icon_path = "assets/icons/Focus.png"
         app_icon = tk.PhotoImage(file=self.app_icon_path)
         self.loop_time = 0
         self.timer_started = False
-        self.timer = None
         self.minimized = False
 
         self.sound_file_path_var = tb.StringVar()

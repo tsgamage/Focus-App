@@ -1,0 +1,111 @@
+import math
+
+class Sessions:
+    def __init__(self, application):
+
+        self.application = application
+
+        self.session_times: dict = {"focus": 6, "shortB": 3, "longB": 5}
+        self.current_session: str = "focus"  # Can use focus, shortB, and longB
+        self.session_number: int = 1
+        self.session_started: bool = False
+        self.current_running_seconds: int = 0
+        self.formated_current_running_time: str = ''
+        self.timer = ''
+
+    def reset_variables(self):
+        self.current_running_seconds = 0
+        self.session_number = 1
+
+    def formate_time(self, seconds: int):
+        """ Update the current seconds to the time in min:sec format """
+        timer_min = math.floor(seconds / 60)
+        timer_sec = seconds % 60
+
+        # Adding a '0' to the front of minutes when it is smaller than 10
+        if timer_min < 10:
+            timer_min = f"0{timer_min}"
+
+        # Adding a '0' to the front of seconds when it is smaller than 10
+        if timer_sec < 10:
+            timer_sec = f"0{timer_sec}"
+
+        # Adding '0' to the seconds when it is zero
+        if timer_sec == 0:
+            timer_sec = "00"
+
+        self.formated_current_running_time =  f"{timer_min}:{timer_sec}"
+        return self.formated_current_running_time
+
+
+    def countdown(self, seconds: int, application):
+        """ The main core of the app. Countdown function. """
+
+        self.current_running_seconds = seconds
+        self.formate_time(seconds)
+
+        if seconds >= 0:
+            print(f"seconds: {seconds}")
+            print(f"current_session:{self.current_session}\n\n")
+
+            self.application.update_ui_timer(self.formated_current_running_time)
+
+            used_percentage = math.floor((seconds / self.session_times[f"{self.current_session}"]) * 100)
+            application.update_ui_meter(used_percentage)
+
+            self.timer = application.after(1000, self.countdown, self.current_running_seconds - 1, self.application)
+
+        elif self.current_running_seconds < 0:
+            print("Session over")
+            self.session_number += 1
+            if self.session_number > 8:
+                self.reset_variables()
+            self.start_session()
+
+
+    def start_session(self):
+
+        print(f"session_number: {self.session_number}")
+
+        """
+        The interval periods of this app
+        1: work,
+        2: break,
+        3: work,
+        4: break,
+        5: work,
+        6: break,
+        7: work,
+        8: long break
+        """
+
+        if self.session_number == 8:
+            self.current_session = "longB"
+
+            passing_value_for_countdown: int = self.session_times["longB"]
+            if self.current_running_seconds > 0:
+                passing_value_for_countdown = self.current_running_seconds
+
+            self.countdown(passing_value_for_countdown, self.application)
+
+            self.application.header_text.configure(text="Long Break")
+
+        elif self.session_number % 2 == 0:
+            self.current_session = "shortB"
+
+            passing_value_for_countdown: int = self.session_times["shortB"]
+            if self.current_running_seconds > 0:
+                passing_value_for_countdown = self.current_running_seconds
+            self.countdown(passing_value_for_countdown, self.application)
+
+            self.application.header_text.configure(text="Short Break")
+
+        elif self.session_number % 2 == 1:
+            self.current_session = "focus"
+
+            passing_value_for_countdown: int = self.session_times["focus"]
+            if self.current_running_seconds > 0:
+                passing_value_for_countdown = self.current_running_seconds
+            self.countdown(passing_value_for_countdown, self.application)
+
+            self.application.header_text.configure(text="Focus")

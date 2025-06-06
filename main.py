@@ -1,5 +1,5 @@
-from focus import FocusApp
+from focus import FocusController
 
 if __name__ == "__main__":
-    app = FocusApp()
+    app = FocusController()
     app.mainloop()

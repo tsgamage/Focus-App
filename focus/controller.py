@@ -1,227 +1,116 @@
+from focus import FocusApp, Sessions
+
+#  These all for the tray icon
 from ttkbootstrap.toast import ToastNotification
-from ui import FocusApp
-import math
 import pystray
-from pystray import MenuItem as item
+from pystray import MenuItem
 from PIL import Image
 import threading
 
+class FocusController(FocusApp, Sessions):
+    def __init__(self):
+        FocusApp.__init__(self)
+        Sessions.__init__(self, self)
+
+        self.is_minimized = False
+        self.window_bottom_text = "Only 3 more sessions to for a long break."
+        self.link_buttons()
+
+    def pause_session(self):
+        self.after_cancel(self.timer)
+
+    def skip_session(self):
+        self.current_running_seconds = 0
+        self.session_number += 1
+        if self.session_number > 8:
+            self.reset_variables()
+        self.start_pause_button.configure(state="disabled", cursor="arrow")
+        self.handle_start_pause_button()
+        self.after(3000, lambda :    self.start_pause_button.configure(state="normal", cursor="hand2")  )
+
+    def reset_timer(self):
+        def back_to_normal():
+            # Enable buttons
+            self.start_pause_button.configure(state="normal", cursor="hand2")
+            self.settings_button.configure(state="normal", cursor="hand2")
+            self.main_bottom_text.configure(text="Paused! Press Start to continue.")
+
+        # Disable all Buttons
+        self.reset_timer_button.configure(state="disabled", cursor="arrow")
+        self.skip_button.configure(state="disabled", cursor="arrow")
+        self.settings_button.configure(state="disabled", cursor="arrow")
+        self.start_pause_button.configure(state="disabled", cursor="arrow")
+
+        current_running_seconds = 0
+        self.update_ui_meter(100)
+        self.update_ui_timer(self.formate_time(self.session_times[f"{self.current_session}"]))
+        self.main_bottom_text.configure(text="Timer has reset!.")
+        self.after(500, back_to_normal)
+
+    def handle_start_pause_button(self):
+
+        if self.session_started:
+            self.session_started = False
+            self.start_pause_button.configure(text="Start")
+
+            # Enable all buttons
+            self.reset_timer_button.configure(state="normal", cursor="hand2")
+            self.skip_button.configure(state="normal", cursor="hand2")
+            self.settings_button.configure(state="normal", cursor="hand2")
+
+            self.main_bottom_text.configure(text="Paused! Press Start to continue.")
+            self.progress_bottom_text.configure(text="Paused! Press Start in Focus Zone to continue.")
+            self.pause_session()
+        else:
+            self.session_started = True
+            self.start_pause_button.configure(text="Pause")
+
+            # Disable all buttons
+            self.reset_timer_button.configure(state="disabled", cursor="arrow")
+            self.skip_button.configure(state="disabled", cursor="arrow")
+            self.settings_button.configure(state="disabled", cursor="arrow")
+
+            self.main_bottom_text.configure(text=self.window_bottom_text)
+            self.progress_bottom_text.configure(text=self.window_bottom_text)
+            self.start_session()
+
+    def hide_window(self):
+        def quit_window(icon, item):
+            icon.stop()
+            # self.destroy()
+            self.quit()
+
+        def show_window(icon, item):
+            self.is_minimized = False
+            icon.stop()
+            self.after(0, self.deiconify)
+
+        def show_about():
+            toast = ToastNotification(
+                title="About Focus App",
+                message="Made with 🖤 by Princess Software Solutions",
+                duration=5000,
+                alert=True,
+                icon="🖤",
+            )
+            toast.show_toast()
+
+        self.withdraw()
+        image = Image.open("assets/icons/Focus.png")
+        menu = (MenuItem("Restore", show_window, default=True),MenuItem("About", show_about), MenuItem('Quit', quit_window))
+        tray_icon = pystray.Icon("Focus", image, "Focus App", menu)
+        threading.Thread(target=tray_icon.run).start()
+
+    def on_minimize(self, event):
+        print(f"Want to minimize: {self.minimize_to_tray_tick.get()}")
+        if self.minimize_to_tray_tick.get():
+            if self.state() == 'iconic' and not self.is_minimized:
+                self.is_minimized = True
+                self.hide_window()
 
 
-app = FocusApp()
-
-current_running_seconds: int = 0
-
-session_times: dict = {"focus":6, "shortB":3, "longB":5}
-current_session: str = "focus" # Can use focus, shortB, and longB
-session_number: int = 7
-timer = ''
-session_started: bool = False
-is_minimized = False
-
-window_bottom_text = "Only 3 more sessions to for a long break."
-
-def formate_time(seconds:int):
-    """ Returns the time in min:sec format """
-    timer_min = math.floor(seconds / 60)
-    timer_sec = seconds % 60
-
-    # Adding a '0' to the front of minutes when it is smaller than 10
-    if timer_min < 10:
-        timer_min = f"0{timer_min}"
-
-    # Adding a '0' to the front of seconds when it is smaller than 10
-    if timer_sec < 10:
-        timer_sec = f"0{timer_sec}"
-
-    # Adding '0' to the seconds when it is zero
-    if timer_sec == 0:
-        timer_sec = "00"
-
-    return f"{timer_min}:{timer_sec}"
-
-def countdown(seconds:int, application):
-    global current_running_seconds, timer, session_number
-
-    current_running_seconds = seconds
-    if seconds >= 0:
-        print(f"seconds: {seconds}")
-        print(f"current_session:{current_session}")
-        formatted_time = formate_time(seconds)
-        application.update_ui_timer(formatted_time)
-
-        used_percentage = math.floor((seconds / session_times[f"{current_session}"]) * 100)
-        application.update_ui_meter(used_percentage)
-
-        timer = app.after(1000, countdown,current_running_seconds - 1, app)
-
-    elif current_running_seconds < 0:
-        print("Session over")
-        session_number += 1
-        if session_number > 8:
-            reset_variables()
-        start_session()
-
-def reset_variables():
-    global current_running_seconds
-    current_running_seconds = 0
-    global session_number
-    session_number = 1
-
-def start_session():
-
-    global session_number
-    global current_session
-
-    print(f"session_number: {session_number}")
-
-    """
-    The interval periods of this app
-    1: work,
-    2: break,
-    3: work,
-    4: break,
-    5: work,
-    6: break,
-    7: work,
-    8: long break
-    """
-
-    if session_number == 8:
-        current_session = "longB"
-
-        passing_value_for_countdown: int = session_times["longB"]
-        if current_running_seconds > 0:
-            passing_value_for_countdown = current_running_seconds
-        countdown(passing_value_for_countdown, app)
-
-        app.header_text.configure(text="Long Break")
-
-    elif session_number % 2 == 0:
-        current_session = "shortB"
-
-        passing_value_for_countdown: int = session_times["shortB"]
-        if current_running_seconds > 0:
-            passing_value_for_countdown = current_running_seconds
-        countdown(passing_value_for_countdown, app)
-
-        app.header_text.configure(text="Short Break")
-
-    elif session_number % 2 == 1:
-        current_session = "focus"
-
-        passing_value_for_countdown: int = session_times["focus"]
-        if current_running_seconds > 0:
-            passing_value_for_countdown = current_running_seconds
-        countdown(passing_value_for_countdown, app)
-
-        app.header_text.configure(text="Focus")
-
-def pause_session():
-    app.after_cancel(timer)
-
-def skip_session():
-    global session_number, current_running_seconds
-    current_running_seconds = 0
-    session_number += 1
-    if session_number > 8:
-        reset_variables()
-    app.start_pause_button.configure(state="disabled", cursor="arrow")
-    handle_start_pause_button()
-    app.after(3000, lambda :    app.start_pause_button.configure(state="normal", cursor="hand2")  )
-
-def reset_timer():
-    print("Resetting timer")
-    global current_running_seconds
-
-    def back_to_normal():
-        # Enable buttons
-        app.start_pause_button.configure(state="normal", cursor="hand2")
-        app.settings_button.configure(state="normal", cursor="hand2")
-
-        app.main_bottom_text.configure(text="Paused! Press Start to continue.")
-        print("Timer has been reset")
-
-    # Disable all Buttons
-    app.reset_timer_button.configure(state="disabled", cursor="arrow")
-    app.skip_button.configure(state="disabled", cursor="arrow")
-    app.settings_button.configure(state="disabled", cursor="arrow")
-    app.start_pause_button.configure(state="disabled", cursor="arrow")
-
-    current_running_seconds = 0
-    app.update_ui_meter(100)
-    app.update_ui_timer(formate_time(session_times[f"{current_session}"]))
-    app.main_bottom_text.configure(text="Timer has reset!.")
-    app.after(500, back_to_normal)
-
-def handle_start_pause_button():
-    global session_started
-
-    if session_started:
-        session_started = False
-        app.start_pause_button.configure(text="Start")
-
-        # Enable all buttons
-        app.reset_timer_button.configure(state="normal", cursor="hand2")
-        app.skip_button.configure(state="normal", cursor="hand2")
-        app.settings_button.configure(state="normal", cursor="hand2")
-
-        app.main_bottom_text.configure(text="Paused! Press Start to continue.")
-        app.progress_bottom_text.configure(text="Paused! Press Start in Focus Zone to continue.")
-        pause_session()
-    else:
-        session_started = True
-        app.start_pause_button.configure(text="Pause")
-
-        # Disable all buttons
-        app.reset_timer_button.configure(state="disabled", cursor="arrow")
-        app.skip_button.configure(state="disabled", cursor="arrow")
-        app.settings_button.configure(state="disabled", cursor="arrow")
-
-        app.main_bottom_text.configure(text=window_bottom_text)
-        app.progress_bottom_text.configure(text=window_bottom_text)
-        start_session()
-
-def hide_window():
-    def quit_window(icon, item):
-        icon.stop()
-        # app.destroy()
-        app.quit()
-
-    def show_window(icon, item):
-        global is_minimized
-        is_minimized = False
-        icon.stop()
-        app.after(0, app.deiconify)
-
-    def show_about():
-        toast = ToastNotification(
-            title="About Focus App",
-            message="Made with 🖤 by Princess Software Solutions",
-            duration=5000,
-            alert=True,
-            icon="🖤",
-        )
-        toast.show_toast()
-
-    app.withdraw()
-    image = Image.open("../assets/icons/Focus.png")
-    menu = (item("Restore", show_window, default=True),item("About", show_about), item('Quit', quit_window))
-    icon = pystray.Icon("Focus", image, "Focus App", menu)
-    threading.Thread(target=icon.run).start()
-
-def on_minimize(event):
-    if app.minimize_to_tray_tick.get():
-        global is_minimized
-        if app.state() == 'iconic' and not is_minimized:
-            is_minimized = True
-            hide_window()
-
-app.bind("<Unmap>", on_minimize)
-
-
-app.start_pause_button.configure(command=handle_start_pause_button)
-app.skip_button.configure(command=skip_session)
-app.reset_timer_button.configure(command=reset_timer)
-
-app.mainloop()
+    def link_buttons(self):
+        self.bind("<Unmap>",self.on_minimize)
+        self.start_pause_button.configure(command=self.handle_start_pause_button)
+        self.skip_button.configure(command=self.skip_session)
+        self.reset_timer_button.configure(command=self.reset_timer)

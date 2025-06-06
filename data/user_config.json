@@ -1,6 +1,7 @@
 {
   "app": {
-    "first_launch": "True"
+    "first_launch": "True",
+    "day": 6
   },
   "default": {
     "theme": "superhero",
