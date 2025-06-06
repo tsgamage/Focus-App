@@ -7,7 +7,7 @@ class Sessions:
 
         self.session_times: dict = {"focus": 6, "shortB": 3, "longB": 5}
         self.current_session: str = "focus"  # Can use focus, shortB, and longB
-        self.session_number: int = 1
+        self.session_number: int = 8
         self.session_started: bool = False
 
         self.current_running_seconds: int = -1
@@ -27,7 +27,7 @@ class Sessions:
 
 
     def reset_variables(self):
-        self.current_running_seconds = 0
+        self.current_running_seconds = -1
         self.session_number = 1
 
     def formate_time(self, seconds: int):
@@ -79,6 +79,7 @@ class Sessions:
             self.session_number += 1
             if self.session_number > 8:
                 self.reset_variables()
+                self._run_after_long_break()
             self.start_session()
 
     def start_session(self):
@@ -129,5 +130,9 @@ class Sessions:
             self.application.header_text.configure(text="Focus")
 
     def _running_after_every_sessions(self):
+        # To be overwritten by controller
+        pass
+
+    def _run_after_long_break(self):
         # To be overwritten by controller
         pass

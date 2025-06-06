@@ -2,6 +2,7 @@
 from .ui import FocusApp
 from .core import Sessions
 from .settings import FocusSettings
+from .quotes import random_quote
 
 from tkinter import messagebox
 
@@ -214,3 +215,8 @@ class FocusController(FocusApp, Sessions, FocusSettings):
     def _running_after_every_sessions(self):
         self.update_progress_tab()
         self.update_bottom_text()
+
+    def _run_after_long_break(self):
+        quote = random_quote()
+        print(f"\n\nquote: {quote}\n\n")
+        self.quote_text.configure(text=quote)

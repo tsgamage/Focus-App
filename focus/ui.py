@@ -233,7 +233,7 @@ class FocusApp(tb.Window):
 
         tb.Separator(self.progress_tab, orient='horizontal').pack( fill="x", pady=(10, 2))
 
-        self.progress_bottom_text = tb.Label(master=self.progress_tab, text="Made with 🖤 by Princess Software Solutions", font=("poppins", 10), bootstyle="info")
+        self.progress_bottom_text = tb.Label(master=self.progress_tab, text="Where Elegance Meets Logic.", font=("poppins", 10), bootstyle="info")
         self.progress_bottom_text.pack()
 
     def reset_progress(self):
