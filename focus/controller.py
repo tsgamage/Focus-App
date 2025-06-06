@@ -220,7 +220,6 @@ class FocusController(FocusApp, Sessions, FocusSettings):
 
     def _run_after_long_break(self):
         quote = random_quote()
-        print(f"\n\nquote: {quote}\n\n")
         self.quote_text.configure(text=quote)
 
     def _run_after_finishing_session(self):

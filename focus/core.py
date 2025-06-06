@@ -62,8 +62,6 @@ class Sessions:
         self._running_after_every_seconds()
 
         if seconds >= 0:
-            print(f"seconds: {seconds}")
-            print(f"current_session:{self.current_session}\n\n")
 
             self.application.update_ui_timer(self.formated_current_running_time)
 
@@ -90,7 +88,6 @@ class Sessions:
 
     def start_session(self):
 
-        print(f"session_number: {self.session_number}")
 
         """
         The interval periods of this app
