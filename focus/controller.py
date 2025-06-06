@@ -238,9 +238,9 @@ class FocusController(FocusApp, Sessions, FocusSettings):
 
     def get_saved_session_times(self):
         saved_session_times = {
-            "focus": self.saved_settings["user"]["users_focus_time"],
-            "shortB": self.saved_settings["user"]["users_short_break_time"],
-            "longB": self.saved_settings["user"]["users_long_break_time"]
+            "focus": (self.saved_settings["user"]["users_focus_time"]) * 60,
+            "shortB": (self.saved_settings["user"]["users_short_break_time"])  * 60,
+            "longB": (self.saved_settings["user"]["users_long_break_time"])  * 60
         }
         self.session_times = saved_session_times
         if self.session_times[self.current_session] < self.current_running_seconds:
