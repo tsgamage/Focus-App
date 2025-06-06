@@ -15,7 +15,6 @@ class FocusApp(tb.Window):
         self.minimized = False
         self.user_settings:dict = {}
 
-        self.sound_file_path_var = tb.StringVar()
         self.users_target_focus_periods = tb.IntVar()
         self.users_focus_time = tb.IntVar()
         self.users_short_break_time = tb.IntVar()
@@ -26,6 +25,7 @@ class FocusApp(tb.Window):
 
         self.app_theme_name = tk.StringVar()
         self.app_theme_name.set("superhero")
+        self.reset_user_settings = False
 
         self.title("Focus App")
         self.geometry("350x512")
@@ -333,10 +333,8 @@ class FocusApp(tb.Window):
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : self.change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : self.change_app_theme("flatly")).grid(row=0,column=2)
 
-        self.reset_settings_to_default_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="danger-outline", text="Reset all settings to defaults",takefocus=False)
-        self.reset_settings_to_default_btn.pack(fill="x", pady=(0, 10))
-        self.settings_save_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="success", text="Save Changes",command=self._on_settings_save, takefocus=False)
-        self.settings_save_btn.pack(fill="x")
+        self.reset_settings_to_default_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="danger-outline", text="Reset all settings to defaults",command=self._on_settings_reset, takefocus=False).pack(fill="x", pady=(0, 10))
+        self.settings_save_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="success", text="Save Changes",command=self._on_settings_save, takefocus=False).pack(fill="x")
 
     def change_app_theme(self, theme):
         self.app_theme_name.set(theme)
@@ -379,3 +377,7 @@ class FocusApp(tb.Window):
         # if tk.messagebox.showinfo("Settings Saved", "Settings saved successfully!"):
         self.settings_window.destroy()
 
+    def _on_settings_reset(self):
+        # This function will be overwritten by the controller
+        if tk.messagebox.askyesno("Reset Settings", "Are you sure you want to reset all settings to default values?"):
+            self.reset_user_settings = True
