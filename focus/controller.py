@@ -3,8 +3,7 @@ from .ui import FocusApp
 from .core import Sessions
 from .settings import FocusSettings
 from .quotes import random_quote
-
-from tkinter import messagebox
+from .notify import play_notification_sound
 
 #  These all for the tray icon
 from ttkbootstrap.toast import ToastNotification
@@ -214,7 +213,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
             self.main_bottom_text.configure(text=self.window_bottom_text)
             self.progress_bottom_text.configure(text=self.window_bottom_text)
 
-    def _running_after_every_sessions(self):
+    def _running_after_every_seconds(self):
         self.update_progress_tab()
         self.update_bottom_text()
 
@@ -222,6 +221,10 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         quote = random_quote()
         print(f"\n\nquote: {quote}\n\n")
         self.quote_text.configure(text=quote)
+
+    def _run_after_finishing_session(self):
+        if self.play_session_sound_tick.get():
+            play_notification_sound()
 
     def handle_reset_today_progress_click(self):
         super().handle_reset_today_progress_click()

@@ -55,7 +55,7 @@ class Sessions:
 
         self.current_running_seconds = seconds
         self.formate_time(seconds)
-        self._running_after_every_sessions()
+        self._running_after_every_seconds()
 
         if seconds >= 0:
             print(f"seconds: {seconds}")
@@ -69,6 +69,8 @@ class Sessions:
             self.timer = application.after(1000, self.countdown, self.current_running_seconds - 1, self.application)
 
         elif self.current_running_seconds < 0:
+            self._run_after_finishing_session()
+
             if self.current_session == "focus":
                 self.total_focus_sessions += 1
             elif self.current_session == "shortB":
@@ -129,10 +131,14 @@ class Sessions:
 
             self.application.header_text.configure(text="Focus")
 
-    def _running_after_every_sessions(self):
+    def _running_after_every_seconds(self):
         # To be overwritten by controller
         pass
 
     def _run_after_long_break(self):
+        # To be overwritten by controller
+        pass
+
+    def _run_after_finishing_session(self):
         # To be overwritten by controller
         pass
