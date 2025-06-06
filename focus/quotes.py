@@ -9,4 +9,4 @@ def random_quote():
         return f"-{selected_quote}-"
     except FileNotFoundError as e:
         print(e)
-        return "-Never give in and never give up-"
+        return "- Never give in and never give up -"

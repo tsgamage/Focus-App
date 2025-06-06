@@ -59,7 +59,7 @@ class FocusApp(tb.Window):
         self.header_text = tb.Label(master=self.main_tab, text="Focus App", font=("montserrat", 26))
         self.header_text.grid(row=0, column=0, columnspan=2, )
 
-        self.quote_text = tb.Label(master=self.main_tab, text="-Never give in and never give up-", font=("poppins", 10))
+        self.quote_text = tb.Label(master=self.main_tab, text="- Never give in and never give up -", font=("poppins", 10))
         self.quote_text.grid(row=1, column=0, columnspan=2)
 
         self.main_meter = tb.Meter(
