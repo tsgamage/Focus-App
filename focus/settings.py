@@ -11,19 +11,12 @@ class FocusSettings:
                 "first_launch": "True",
                 "day": 9
             },
-            "default": {
-                "theme": "superhero",
-                "default_target_sessions": 10,
-                "default_focus_time": 25,
-                "default_short_break_time": 5,
-                "default_long_break_time": 20,
-            },
             "user": {
-                "theme": "",
-                "users_target_sessions": 0,
-                "users_focus_time": 0,
-                "users_short_break_time": 0,
-                "users_long_break_time": 0,
+                "theme": "superhero",
+                "users_target_sessions": 10,
+                "users_focus_time": 25,
+                "users_short_break_time": 5,
+                "users_long_break_time": 20,
                 "total_focus_sessions_completed": 0,
                 "total_short_breaks_got": 0,
                 "total_long_breaks_got": 0,
@@ -61,4 +54,6 @@ class FocusSettings:
             self.saved_settings = updated_data
 
     def reset_settings(self):
-        self.save_settings(self.default_settings)
+        with open(self.settings_file_path, "w") as settings_file:
+            json.dump(self.default_settings, settings_file, indent=4)
+        self.saved_settings = self.default_settings
