@@ -119,4 +119,3 @@ class FocusController(FocusApp, Sessions, FocusSettings):
     def _on_settings_save(self):
         super()._on_settings_save()
         self.save_settings(self.user_settings)
-        print(f"saved settings: {self.user_settings}")

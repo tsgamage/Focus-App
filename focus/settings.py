@@ -1,6 +1,6 @@
 import json
 
-class Settings:
+class FocusSettings:
     def __init__(self):
 
         self.settings_file_name = "user_config.json"
@@ -17,7 +17,6 @@ class Settings:
                 "default_focus_time": 25,
                 "default_short_break_time": 5,
                 "default_long_break_time": 20,
-                "sound_path": ""
             },
             "user": {
                 "theme": "",
@@ -28,7 +27,6 @@ class Settings:
                 "total_focus_sessions_completed": 0,
                 "total_short_breaks_got": 0,
                 "total_long_breaks_got": 0,
-                "sound_path": ""
             }
         }
 
@@ -46,18 +44,21 @@ class Settings:
         finally:
             return self.saved_settings
 
+
     def save_settings(self, settings_to_save: dict):
-        data = self.load_settings()
-        data.update(settings_to_save)
+
+        updated_data = self.saved_settings
+        for key, value in settings_to_save.items():
+            updated_data["user"][key] = value
 
         try:
             with open(self.settings_file_path, "w") as settings_file:
-                json.dump(data, settings_file, indent=4)
+                json.dump(updated_data, settings_file, indent=4)
         except FileNotFoundError:
             print("Error: Could not save settings.")
             return
         finally:
-            self.saved_settings = data
+            self.saved_settings = updated_data
 
     def reset_settings(self):
         self.save_settings(self.default_settings)

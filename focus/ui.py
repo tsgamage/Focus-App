@@ -370,14 +370,12 @@ class FocusApp(tb.Window):
     def _on_settings_save(self):
         # This function will be overwritten by the controller
         self.user_settings = {
-                "user": {
                     "theme": self.app_theme_name.get(),  # from a ttkbootstrap StringVar
-                    "target_sessions": int(self.users_target_focus_periods.get()),
-                    "focus_time": int(self.users_focus_time.get()),
-                    "short_break_time": int(self.users_short_break_time.get()),
-                    "long_break_time": int(self.users_long_break_time.get()),
-                }
-            }
-        if tk.messagebox.showinfo("Settings Saved", "Settings saved successfully!"):
-            self.settings_window.destroy()
+                    "users_target_sessions": int(self.users_target_focus_periods.get()),
+                    "users_focus_time": int(self.users_focus_time.get()),
+                    "users_short_break_time": int(self.users_short_break_time.get()),
+                    "users_long_break_time": int(self.users_long_break_time.get()),
+        }
+        # if tk.messagebox.showinfo("Settings Saved", "Settings saved successfully!"):
+        self.settings_window.destroy()
 
