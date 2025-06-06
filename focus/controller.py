@@ -61,7 +61,8 @@ class FocusController(FocusApp, Sessions, FocusSettings):
             # Enable buttons
             self.start_pause_button.configure(state="normal", cursor="hand2")
             self.settings_button.configure(state="normal", cursor="hand2")
-            self.main_bottom_text.configure(text="Paused! Press Start to continue.")
+            self.window_bottom_text = "Paused! Press Start to continue."
+            self.update_bottom_text()
 
         # Disable all Buttons
         self.reset_timer_button.configure(state="disabled", cursor="arrow")
@@ -72,7 +73,8 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.current_running_seconds = -1
         self.update_ui_meter(100)
         self.update_ui_timer(self.formate_time(self.session_times[f"{self.current_session}"]))
-        self.main_bottom_text.configure(text="Timer has reset!.")
+        self.window_bottom_text = "Timer has been reset!"
+        self.update_bottom_text()
         self.after(500, back_to_normal)
 
     def handle_start_pause_button(self):
