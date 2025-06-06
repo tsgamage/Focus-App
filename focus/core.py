@@ -67,8 +67,8 @@ class Sessions:
 
             self.application.update_ui_timer(self.formated_current_running_time)
 
-            used_percentage = math.floor((seconds / self.session_times[f"{self.current_session}"]) * 100)
-            application.update_ui_meter(used_percentage)
+            # used_percentage = math.floor((seconds / self.session_times[f"{self.current_session}"]) * 100)
+            application.update_ui_meter(seconds, self.session_times[f"{self.current_session}"])
 
             self.timer = application.after(1000, self.countdown, self.current_running_seconds - 1, self.application)
 

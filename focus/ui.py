@@ -363,10 +363,13 @@ class FocusApp(tb.Window):
             self.main_meter.configure(bootstyle="primary")
             self.timer_label.configure(bootstyle="primary")
 
-    def update_ui_meter(self, amount_used:int):
+    def update_ui_meter(self, amount_used:int, amount_total:int):
         """Update the meter in the main tab"""
         # self.update_timer_color(amount_used)
-        self.main_meter.configure(amountused=amount_used)
+        self.main_meter.configure (
+            amountused=amount_used,
+            amounttotal=amount_total
+        )
 
     def _on_settings_save(self):
         # This function will be overwritten by the controller

@@ -72,7 +72,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.start_pause_button.configure(state="disabled", cursor="arrow")
 
         self.current_running_seconds = -1
-        self.update_ui_meter(100)
+        self.update_ui_meter(100, 100)
         self.update_ui_timer(self.formate_time(self.session_times[f"{self.current_session}"]))
         self.window_bottom_text = "Timer has been reset!"
         self.update_bottom_text()
@@ -243,3 +243,5 @@ class FocusController(FocusApp, Sessions, FocusSettings):
             "longB": self.saved_settings["user"]["users_long_break_time"]
         }
         self.session_times = saved_session_times
+        if self.session_times[self.current_session] < self.current_running_seconds:
+            self.current_running_seconds = self.session_times[self.current_session]
