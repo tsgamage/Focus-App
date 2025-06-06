@@ -17,7 +17,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
 
         self.is_minimized = False
         self.window_bottom_text = "Only 3 more sessions to for a long break."
-        self.after(1000, self.link_buttons)
+        self.link_buttons()
 
     def link_buttons(self):
         self.bind("<Unmap>",self.on_minimize)

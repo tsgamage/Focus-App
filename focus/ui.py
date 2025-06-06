@@ -265,7 +265,7 @@ class FocusApp(tb.Window):
         main_height = self.winfo_height()
 
         win_width = 300
-        win_height = 430
+        win_height = 395
         pos_x = x + (main_width // 2) - (win_width // 2)
         pos_y = y + (main_height // 2) - (win_height // 2)
 
@@ -315,13 +315,13 @@ class FocusApp(tb.Window):
         tb.Label(long_break_line, text="Long Break Time in minutes :").pack(side="left")
         tb.Spinbox(long_break_line,textvariable= self.users_long_break_time, from_=0, to=30, width=5, state="readonly").pack(side="right")
 
-        # Frame for the sound browse button ----------------
-        session_sound_label_frame = tb.LabelFrame(self.settings_window, text="  Set custom session changing sound  ",padding=(10, 10))
-        session_sound_label_frame.pack(fill="x", pady=(0, 10))
-
-        self.sound_file_path_var.set("No custom sound set")
-        tb.Entry(session_sound_label_frame, textvariable=self.sound_file_path_var, width=27, state="readonly").pack(side="left")
-        tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).pack(side="right")
+        # # Frame for the sound browse button ----------------
+        # session_sound_label_frame = tb.LabelFrame(self.settings_window, text="  Set custom session changing sound  ",padding=(10, 10))
+        # session_sound_label_frame.pack(fill="x", pady=(0, 10))
+        #
+        # self.sound_file_path_var.set("No custom sound set")
+        # tb.Entry(session_sound_label_frame, textvariable=self.sound_file_path_var, width=27, state="readonly").pack(side="left")
+        # tb.Button(session_sound_label_frame, cursor="hand2", text="Browse", command=self.on_browse, width=8).pack(side="right")
 
         # Frame for change app theme ----------------
         app_theme_change_frame = tb.Labelframe(self.settings_window, text="  Change application theme  ", padding=(10, 10))
@@ -333,6 +333,8 @@ class FocusApp(tb.Window):
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="dark", width=10, text="Dark", command=lambda : self.change_app_theme("darkly")).grid(row=0, column=1,padx=(0, 5))
         tb.Button(app_theme_change_frame, cursor="hand2", bootstyle="light", width=10, text="White", command=lambda : self.change_app_theme("flatly")).grid(row=0,column=2)
 
+        self.reset_settings_to_default_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="danger-outline", text="Reset all settings to defaults",takefocus=False)
+        self.reset_settings_to_default_btn.pack(fill="x", pady=(0, 10))
         self.settings_save_btn = tb.Button(self.settings_window, cursor="hand2", bootstyle="success", text="Save Changes",command=self._on_settings_save, takefocus=False)
         self.settings_save_btn.pack(fill="x")
 
