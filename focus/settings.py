@@ -1,14 +1,41 @@
 import json
 import datetime as dt
+import os
 
+
+def setting_file_is_correct(user_data_dict, default_data_dict):
+    def extract_keys(data_dict):
+        extracted_key_list = []
+
+        for key, value in data_dict.items():
+            extracted_key_list.append(key)
+            for inner_keys in data_dict[key]:
+                extracted_key_list.append(inner_keys)
+
+        return extracted_key_list
+
+    user_data_keys = extract_keys(user_data_dict)
+    default_data_keys = extract_keys(default_data_dict)
+
+    return user_data_keys == default_data_keys
 
 class FocusSettings:
     def __init__(self):
 
-        self.settings_file_name = "user_config.json"
-        self.settings_file_path = f"data/{self.settings_file_name}"
+        self.PARENT_PATH = "Princess Software Solutions"
+        self.APP_NAME = "Focus App"
+        self.SUB_FILE_NAME = "data"
+        self.SETTINGS_FILE_NAME = "user_config.json"
 
-        self.folder_structure = {
+        self.APP_FOLDER = os.path.join(os.getenv("APPDATA"), self.PARENT_PATH, self.APP_NAME, self.SUB_FILE_NAME)
+
+        # Generate the folder if it doesn't exist.'
+        os.makedirs(self.APP_FOLDER, exist_ok=True)
+
+        self.USER_SETTINGS_FILE_PATH = os.path.join(self.APP_FOLDER, self.SETTINGS_FILE_NAME)
+
+        # Default Settings
+        self.FOLDER_STRUCTURE = {
             "app": {
                 "first_launch": "True",
                 "day": 9
@@ -24,8 +51,7 @@ class FocusSettings:
                 "total_long_breaks_got": 0,
             }
         }
-
-        self.default_user_settings = {
+        self.DEFAULT_USER_SETTINGS = {
             "users_target_sessions": 10,
             "users_focus_time": 25,
             "users_short_break_time": 5,
@@ -33,47 +59,49 @@ class FocusSettings:
             "total_focus_sessions_completed": 0,
             "total_short_breaks_got": 0,
             "total_long_breaks_got": 0,
-        }
+        } # Make this separately because it's easy to reset user data with this
 
-        self.saved_settings = ""
+        # Loaded user settings will be stored here.
+        self.saved_settings = {}
+
         self.load_settings()
+
+        # Check if the settings file is correct. If not, reset it.
+        if not setting_file_is_correct(self.saved_settings, self.FOLDER_STRUCTURE):
+            self.update_user_settings("reset")
+
         self.reset_user_progress_daily()
 
+
+    # Load the settings file.
     def load_settings(self):
         try:
-            with open(self.settings_file_path, "r") as settings_file:
+            with open(self.USER_SETTINGS_FILE_PATH, "r") as settings_file:
                 self.saved_settings = json.load(settings_file)
-        except FileNotFoundError:
-            self.saved_settings = self.folder_structure
-            with open(self.settings_file_path, "w") as settings_file:
-                json.dump(self.folder_structure, settings_file, indent=4)
-        finally:
-            return self.saved_settings
 
-    def save_user_settings(self, settings_to_save: dict):
+        # Create the settings file if it doesn't exist and insert default values.
+        except FileNotFoundError:
+            self.saved_settings = self.FOLDER_STRUCTURE
+            with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
+                json.dump(self.FOLDER_STRUCTURE, settings_file, indent=4)
+
+    def update_user_settings(self, settings_to_save):
+        users_data = settings_to_save
+        if settings_to_save == "reset":
+            users_data = self.DEFAULT_USER_SETTINGS
+
         updated_data = self.saved_settings
-        for key, value in settings_to_save.items():
+        for key, value in users_data.items():
             updated_data["user"][key] = value
 
+        # Try to save the updated settings.
         try:
-            with open(self.settings_file_path, "w") as settings_file:
+            with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                 json.dump(updated_data, settings_file, indent=4)
-        except FileNotFoundError:
-            print("Error: Could not save settings.")
-            return
-        finally:
-            self.saved_settings = updated_data
 
-    def reset_settings(self):
-        updated_data = self.saved_settings
-        for key, value in self.default_user_settings.items():
-            updated_data["user"][key] = value
-        try:
-            with open(self.settings_file_path, "w") as settings_file:
-                json.dump(updated_data, settings_file, indent=4)
         except FileNotFoundError:
             print("Error: Could not save settings.")
-            return
+
         finally:
             self.saved_settings = updated_data
 
@@ -84,14 +112,14 @@ class FocusSettings:
             updated_date = self.saved_settings
             updated_date["app"]["day"] = today
             try:
-                with open(self.settings_file_path, "w") as settings_file:
+                with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                     json.dump(updated_date, settings_file, indent=4)
                 reset_progress = {
                     "total_focus_sessions_completed": 0,
                     "total_short_breaks_got": 0,
                     "total_long_breaks_got": 0,
                 }
-                self.save_user_settings(reset_progress)
+                self.update_user_settings(reset_progress)
             except FileNotFoundError:
                 print("Error: Could not save settings.")
                 return
@@ -99,7 +127,6 @@ class FocusSettings:
                 self.load_settings()
 
         else:
-            print("Restoring Progress")
             self.load_settings()
 
     def update_first_launch(self):
@@ -110,7 +137,7 @@ class FocusSettings:
             updated_data = saved_data
             updated_data["app"]['first_launch'] = False
             try:
-                with open(self.settings_file_path, "w") as settings_file:
+                with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                     json.dump(updated_data, settings_file, indent=4)
             except FileNotFoundError:
                 print("Error: Could not save settings.")

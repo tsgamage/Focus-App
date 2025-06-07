@@ -142,14 +142,15 @@ class FocusController(FocusApp, Sessions, FocusSettings):
 
     def _on_settings_save(self):
         super()._on_settings_save()
-        self.save_user_settings(self.user_settings)
+        self.update_user_settings(self.user_settings)
         self.restore_progress_tab()
         self.get_saved_session_times()
+        self.reset_timer()
 
     def _on_settings_reset(self):
         super()._on_settings_reset()
         if self.reset_user_settings:
-            self.reset_settings()
+            self.update_user_settings("reset")
             self.update_ui_settings_with_saved_settings()
             self.reset_user_settings = False
 
@@ -206,7 +207,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
             "total_short_breaks_got": self.total_short_break_sessions,
             "total_long_breaks_got": self.total_long_break_sessions
         }
-        self.save_user_settings(user_progress_data)
+        self.update_user_settings(user_progress_data)
 
     def update_bottom_text(self):
         is_first_launch = self.saved_settings["app"]['first_launch']
