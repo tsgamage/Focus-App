@@ -291,7 +291,7 @@ class FocusApp(tb.Window):
         users_targets_frame.pack(fill="x", pady=(0, 10))
 
         tb.Label(users_targets_frame, text="Target Focus Periods per day :").pack(side="left")
-        tb.Spinbox(users_targets_frame,textvariable= self.users_target_focus_periods, from_=0, to=10, width=2, state="readonly").pack(side="right")
+        tb.Spinbox(users_targets_frame,textvariable= self.users_target_focus_periods, from_=1, to=20, width=2, state="readonly").pack(side="right")
 
         # Frame for custom timer inputs ----------------
         custom_timer_input_frame = tb.Labelframe(self.settings_window, text="  Enter times in minutes  ", padding=(10, 5))

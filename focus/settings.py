@@ -70,6 +70,8 @@ class FocusSettings:
         if not setting_file_is_correct(self.saved_settings, self.FOLDER_STRUCTURE):
             self.update_user_settings("reset")
 
+        self.reset_user_settings_if_they_changed_to_wrong()
+
         self.reset_user_progress_daily()
 
 
@@ -80,7 +82,7 @@ class FocusSettings:
                 self.saved_settings = json.load(settings_file)
 
         # Create the settings file if it doesn't exist and insert default values.
-        except FileNotFoundError:
+        except:
             self.saved_settings = self.FOLDER_STRUCTURE
             with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                 json.dump(self.FOLDER_STRUCTURE, settings_file, indent=4)
@@ -146,4 +148,31 @@ class FocusSettings:
                 self.saved_settings = updated_data
         else:
             return
+
+    def reset_user_settings_if_they_changed_to_wrong(self):
+        is_target_sessions_zero = self.saved_settings["user"]["users_target_sessions"] == 0
+        is_focus_time_zero = self.saved_settings["user"]["users_focus_time"] == 0
+        is_short_break_time_zero = self.saved_settings["user"]["users_short_break_time"] == 0
+        is_long_break_time_zero = self.saved_settings["user"]["users_long_break_time"] == 0
+
+        is_first_launch_is_bool = not isinstance(self.saved_settings["app"]["first_launch"], bool)
+        is_day_is_int = not isinstance(self.saved_settings["app"]["day"], int)
+        is_target_sessions_is_int = not isinstance(self.saved_settings["user"]["users_target_sessions"], int)
+        is_focus_time_is_int = not isinstance(self.saved_settings["user"]["users_focus_time"], int)
+        is_short_break_time_is_int = not isinstance(self.saved_settings["user"]["users_short_break_time"], int)
+        is_long_break_time_is_int = not isinstance(self.saved_settings["user"]["users_long_break_time"], int)
+        is_total_focus_sessions_completed_is_int = not isinstance(self.saved_settings["user"]["total_focus_sessions_completed"], int)
+        is_total_short_breaks_got_is_int = not isinstance(self.saved_settings["user"]["total_short_breaks_got"], int)
+        is_total_long_breaks_got_is_int = not isinstance(self.saved_settings["user"]["total_long_breaks_got"], int)
+
+
+
+        if is_target_sessions_zero or is_focus_time_zero or is_short_break_time_zero or is_long_break_time_zero:
+            self.update_user_settings("reset")
+
+        if is_first_launch_is_bool or is_day_is_int or is_target_sessions_is_int or is_focus_time_is_int or is_short_break_time_is_int or is_long_break_time_is_int or is_total_focus_sessions_completed_is_int or is_total_short_breaks_got_is_int or is_total_long_breaks_got_is_int:
+            self.update_user_settings("reset")
+
+
+
 
