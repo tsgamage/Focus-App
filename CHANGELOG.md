@@ -19,3 +19,22 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Installer created using Inno Setup (.exe file)
 
 ---
+
+## [v1.1.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.1.0) - 2025-06-08
+
+### Fixed
+- Resolved `PermissionError` when saving `user_config.json` to protected directories like `Program Files`.
+- Fixed crash when users edited or corrupted the `user_config.json` file manually.
+
+### Added
+- Validation and auto-reset logic for settings file integrity.
+- Safe fallback location using `%APPDATA%` for storing user settings to avoid permission issues.
+
+### Changed
+- Refactored and unified settings update flow into a cleaner `update_user_settings` method.
+- Removed unused `user_config.json` related code and logic.
+
+### Removed
+- Deprecated usage of settings file in restricted locations.
+
+---
