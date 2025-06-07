@@ -42,11 +42,6 @@
 ## Versioning & Changelog
 
 >Focus App follows [Semantic Versioning](https://semver.org/):
-
-| Version | Release Date | Notes                   |
-| ------- | ------------ | ----------------------- |
-| v0.1.0  | 2025-06-07   | First public release    |
-
 [View the full changelog](./CHANGELOG.md)
 
 ---
