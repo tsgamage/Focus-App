@@ -42,6 +42,7 @@
 ## Versioning & Changelog
 
 >Focus App follows [Semantic Versioning](https://semver.org/):
+
 [View the full changelog](./CHANGELOG.md)
 
 ---
