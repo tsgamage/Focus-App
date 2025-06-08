@@ -5,21 +5,6 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [v1.0.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.0.0) - 2025-06-07
-### Added
-- Initial public release of **Focus App** 
-- A **clean**, **modern** focus timer, built with **Python** and `ttkbootstrap`
-- Core features:
-  - Pomodoro timer with configurable intervals
-  - Light/Dark mode switch with ttkbootstrap styling
-  - Auto and manual cycle switching
-  - Progress tab to track daily focus time
-  - Saves your settings automatically (using JSON)
-  - Clean modular structure
-- Installer created using Inno Setup (.exe file)
-
----
-
 ## [v1.1.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.1.0) - 2025-06-08
 
 ### Fixed
@@ -38,3 +23,20 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Deprecated usage of settings file in restricted locations.
 
 ---
+
+## [v1.0.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.0.0) - 2025-06-07
+### Added
+- Initial public release of **Focus App** 
+- A **clean**, **modern** focus timer, built with **Python** and `ttkbootstrap`
+- Core features:
+  - Pomodoro timer with configurable intervals
+  - Light/Dark mode switch with ttkbootstrap styling
+  - Auto and manual cycle switching
+  - Progress tab to track daily focus time
+  - Saves your settings automatically (using JSON)
+  - Clean modular structure
+- Installer created using Inno Setup (.exe file)
+
+---
+
+
