@@ -150,7 +150,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
     def _on_settings_reset(self):
         super()._on_settings_reset()
         if self.reset_user_settings:
-            self.update_user_settings("reset")
+            self.update_user_settings("resetSettings")
             self.update_ui_settings_with_saved_settings()
             self.reset_user_settings = False
 
