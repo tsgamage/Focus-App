@@ -5,6 +5,20 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v1.2.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.2.0) - 2025-06-10
+
+### Added
+- Auto-update feature: The app now checks for the latest version on startup and provides a prompt to download and install updates.
+- Version tracking system using a local version file `app_info.json`, enabling smooth comparison between installed and latest versions.
+
+### Fixed
+- Resolved a critical bug where resetting time settings would unintentionally reset all user data.
+
+### Notes
+- This version prepares the foundation for seamless background update experiences in future releases.
+
+---
+
 ## [v1.1.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.1.0) - 2025-06-08
 
 ### Fixed
