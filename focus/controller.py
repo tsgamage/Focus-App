@@ -4,6 +4,8 @@ from .core import Sessions
 from .settings import FocusSettings
 from .quotes import random_quote
 from .notify import play_notification_sound
+from .autoUpdate import AutoUpdate
+
 
 #  These all for the tray icon
 from ttkbootstrap.toast import ToastNotification
@@ -22,11 +24,12 @@ def progress_times_formater(minutes:int):
         return f"{hours}h & {minutes}min"
 
 
-class FocusController(FocusApp, Sessions, FocusSettings):
+class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
     def __init__(self):
         FocusApp.__init__(self)
         FocusSettings.__init__(self)
         Sessions.__init__(self, self)
+        AutoUpdate.__init__(self)
 
         self.is_minimized = False
         self.window_bottom_text = "Press Start to start the timer."
@@ -36,6 +39,9 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.restore_progress_tab()
         self.update_bottom_text()
         self.update_first_launch()
+
+        self.get_current_app_info()
+        self.update_app()
 
 
 
@@ -245,3 +251,7 @@ class FocusController(FocusApp, Sessions, FocusSettings):
         self.session_times = saved_session_times
         if self.session_times[self.current_session] < self.current_running_seconds:
             self.current_running_seconds = self.session_times[self.current_session]
+
+    def finish_downloading(self):
+        super().finish_downloading()
+        self.quit()
