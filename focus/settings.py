@@ -51,7 +51,8 @@ class FocusSettings:
                 "total_long_breaks_got": 0,
             }
         }
-        self.DEFAULT_USER_SETTINGS = {
+        # Make these separately because it's easy to reset all data with this
+        self.DEFAULT_ALL_SETTINGS = {
             "users_target_sessions": 10,
             "users_focus_time": 25,
             "users_short_break_time": 5,
@@ -59,7 +60,18 @@ class FocusSettings:
             "total_focus_sessions_completed": 0,
             "total_short_breaks_got": 0,
             "total_long_breaks_got": 0,
-        } # Make this separately because it's easy to reset user data with this
+        }
+        self.DEFAULT_USER_SETTINGS = {
+            "users_target_sessions": 10,
+            "users_focus_time": 25,
+            "users_short_break_time": 5,
+            "users_long_break_time": 20,
+        }
+        self.DEFAULT_PROGRESS_SETTINGS = {
+            "total_focus_sessions_completed": 0,
+            "total_short_breaks_got": 0,
+            "total_long_breaks_got": 0,
+        }
 
         # Loaded user settings will be stored here.
         self.saved_settings = {}
@@ -68,7 +80,7 @@ class FocusSettings:
 
         # Check if the settings file is correct. If not, reset it.
         if not setting_file_is_correct(self.saved_settings, self.FOLDER_STRUCTURE):
-            self.update_user_settings("reset")
+            self.update_user_settings("resetAll")
 
         self.reset_user_settings_if_they_changed_to_wrong()
 
@@ -89,7 +101,10 @@ class FocusSettings:
 
     def update_user_settings(self, settings_to_save):
         users_data = settings_to_save
-        if settings_to_save == "reset":
+        if settings_to_save == "resetAll":
+            users_data = self.DEFAULT_ALL_SETTINGS
+
+        if settings_to_save == "resetSettings":
             users_data = self.DEFAULT_USER_SETTINGS
 
         updated_data = self.saved_settings
@@ -168,10 +183,10 @@ class FocusSettings:
 
 
         if is_target_sessions_zero or is_focus_time_zero or is_short_break_time_zero or is_long_break_time_zero:
-            self.update_user_settings("reset")
+            self.update_user_settings("resetAll")
 
         if is_first_launch_is_bool or is_day_is_int or is_target_sessions_is_int or is_focus_time_is_int or is_short_break_time_is_int or is_long_break_time_is_int or is_total_focus_sessions_completed_is_int or is_total_short_breaks_got_is_int or is_total_long_breaks_got_is_int:
-            self.update_user_settings("reset")
+            self.update_user_settings("resetAll")
 
 
 
