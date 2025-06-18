@@ -283,6 +283,7 @@ class FocusApp(tb.Window):
         def on_close():
             if tk.messagebox.askyesno("Exit", "Close without saving?"):
                 self.settings_window.destroy()
+                self._on_settings_close()
 
         self.settings_window.protocol("WM_DELETE_WINDOW", on_close)
 
@@ -387,3 +388,7 @@ class FocusApp(tb.Window):
         # This function will be overwritten by the controller
         if tk.messagebox.askyesno("Reset Settings", "Are you sure you want to reset all settings to default values?"):
             self.reset_user_settings = True
+
+    def _on_settings_close(self):
+        # This function will be overwritten by the controller
+        pass
