@@ -46,10 +46,46 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
 
 
     def link_buttons(self):
-        self.bind("<Unmap>",self.on_minimize)
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.start_pause_button.configure(command=self.handle_start_pause_button)
         self.skip_button.configure(command=self.skip_session)
         self.reset_timer_button.configure(command=self.reset_timer)
+
+    # Hiding the window when the close button clicked
+    def hide_window(self):
+        def quit_window(icon, item):
+            icon.stop()
+            # self.destroy()
+            self.quit()
+
+        def show_window(icon, item):
+            self.is_minimized = False
+            icon.stop()
+            self.after(0, self.deiconify)
+
+        def show_about():
+            toast = ToastNotification(
+                title="About Focus App",
+                message="Made with 🖤 by Princess Software Solutions",
+                duration=5000,
+                alert=True,
+                icon="🖤",
+            )
+            toast.show_toast()
+
+        self.withdraw()
+        image = Image.open("assets/icons/Focus.png")
+        menu = (MenuItem("Restore", show_window, default=True),MenuItem("About", show_about), MenuItem('Quit', quit_window))
+        tray_icon = pystray.Icon("Focus", image, "Focus App", menu)
+        threading.Thread(target=tray_icon.run).start()
+
+    def on_close(self):
+        if self.minimize_to_tray_tick.get():
+            if self.state() == 'normal' and not self.is_minimized:
+                self.is_minimized = True
+                self.hide_window()
+        else:
+            self.destroy()
 
     def pause_session(self):
         self.after_cancel(self.timer)
@@ -112,39 +148,6 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
             self.window_bottom_text = "Timer has started!"
             self.update_bottom_text()
             self.start_session()
-
-    def hide_window(self):
-        def quit_window(icon, item):
-            icon.stop()
-            # self.destroy()
-            self.quit()
-
-        def show_window(icon, item):
-            self.is_minimized = False
-            icon.stop()
-            self.after(0, self.deiconify)
-
-        def show_about():
-            toast = ToastNotification(
-                title="About Focus App",
-                message="Made with 🖤 by Princess Software Solutions",
-                duration=5000,
-                alert=True,
-                icon="🖤",
-            )
-            toast.show_toast()
-
-        self.withdraw()
-        image = Image.open("assets/icons/Focus.png")
-        menu = (MenuItem("Restore", show_window, default=True),MenuItem("About", show_about), MenuItem('Quit', quit_window))
-        tray_icon = pystray.Icon("Focus", image, "Focus App", menu)
-        threading.Thread(target=tray_icon.run).start()
-
-    def on_minimize(self, event):
-        if self.minimize_to_tray_tick.get():
-            if self.state() == 'iconic' and not self.is_minimized:
-                self.is_minimized = True
-                self.hide_window()
 
     def _on_settings_save(self):
         super()._on_settings_save()
