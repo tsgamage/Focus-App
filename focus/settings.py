@@ -47,8 +47,10 @@ class FocusSettings:
                 "users_short_break_time": 5,
                 "users_long_break_time": 20,
                 "total_focus_sessions_completed": 0,
-                "total_short_breaks_got": 0,
-                "total_long_breaks_got": 0,
+                "total_short_breaks_completed": 0,
+                "total_long_breaks_completed": 0,
+                "total_focus_minutes": 0,
+                "total_break_minutes":0,
             }
         }
         # Make these separately because it's easy to reset all data with this
@@ -58,8 +60,10 @@ class FocusSettings:
             "users_short_break_time": 5,
             "users_long_break_time": 20,
             "total_focus_sessions_completed": 0,
-            "total_short_breaks_got": 0,
-            "total_long_breaks_got": 0,
+            "total_short_breaks_completed": 0,
+            "total_long_breaks_completed": 0,
+            "total_focus_minutes": 0,
+            "total_break_minutes": 0,
         }
         self.DEFAULT_USER_SETTINGS = {
             "users_target_sessions": 10,
@@ -69,8 +73,10 @@ class FocusSettings:
         }
         self.DEFAULT_PROGRESS_SETTINGS = {
             "total_focus_sessions_completed": 0,
-            "total_short_breaks_got": 0,
-            "total_long_breaks_got": 0,
+            "total_short_breaks_completed": 0,
+            "total_long_breaks_completed": 0,
+            "total_focus_minutes": 0,
+            "total_break_minutes": 0,
         }
 
         # Loaded user settings will be stored here.
@@ -133,8 +139,8 @@ class FocusSettings:
                     json.dump(updated_date, settings_file, indent=4)
                 reset_progress = {
                     "total_focus_sessions_completed": 0,
-                    "total_short_breaks_got": 0,
-                    "total_long_breaks_got": 0,
+                    "total_short_breaks_completed": 0,
+                    "total_long_breaks_completed": 0,
                 }
                 self.update_user_settings(reset_progress)
             except FileNotFoundError:
@@ -177,13 +183,13 @@ class FocusSettings:
         is_short_break_time_is_int = not isinstance(self.saved_settings["user"]["users_short_break_time"], int)
         is_long_break_time_is_int = not isinstance(self.saved_settings["user"]["users_long_break_time"], int)
         is_total_focus_sessions_completed_is_int = not isinstance(self.saved_settings["user"]["total_focus_sessions_completed"], int)
-        is_total_short_breaks_got_is_int = not isinstance(self.saved_settings["user"]["total_short_breaks_got"], int)
-        is_total_long_breaks_got_is_int = not isinstance(self.saved_settings["user"]["total_long_breaks_got"], int)
-
-
+        is_total_short_breaks_completed_is_int = not isinstance(self.saved_settings["user"]["total_short_breaks_completed"], int)
+        is_total_long_breaks_completed_is_int = not isinstance(self.saved_settings["user"]["total_long_breaks_completed"], int)
+        is_total_focus_minutes_is_int = not isinstance(self.saved_settings["user"]["total_focus_minutes"], int)
+        is_total_break_minutes_is_int = not isinstance(self.saved_settings["user"]["total_break_minutes"], int)
 
         if is_target_sessions_zero or is_focus_time_zero or is_short_break_time_zero or is_long_break_time_zero:
             self.update_user_settings("resetAll")
 
-        if is_first_launch_is_bool or is_day_is_int or is_target_sessions_is_int or is_focus_time_is_int or is_short_break_time_is_int or is_long_break_time_is_int or is_total_focus_sessions_completed_is_int or is_total_short_breaks_got_is_int or is_total_long_breaks_got_is_int:
+        if is_first_launch_is_bool or is_day_is_int or is_target_sessions_is_int or is_focus_time_is_int or is_short_break_time_is_int or is_long_break_time_is_int or is_total_focus_sessions_completed_is_int or is_total_short_breaks_completed_is_int or is_total_long_breaks_completed_is_int or is_total_focus_minutes_is_int or is_total_break_minutes_is_int:
             self.update_user_settings("resetAll")

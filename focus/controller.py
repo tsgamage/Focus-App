@@ -176,51 +176,41 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
             self.change_app_theme(self.saved_settings["user"]["theme"])
 
     def restore_progress_tab(self):
-        self.total_focus_sessions = self.saved_settings["user"]["total_focus_sessions_completed"]
-        self.total_short_break_sessions = self.saved_settings["user"]["total_short_breaks_got"]
-        self.total_long_break_sessions = self.saved_settings["user"]["total_long_breaks_got"]
+        self.total_focus_sessions_completed = self.saved_settings["user"]["total_focus_sessions_completed"]
+        self.total_short_break_sessions_completed = self.saved_settings["user"]["total_short_breaks_completed"]
+        self.total_long_break_sessions_completed = self.saved_settings["user"]["total_long_breaks_completed"]
+
+        self.total_focus_minutes = self.saved_settings["user"]["total_focus_minutes"]
+        self.total_break_minutes = self.saved_settings["user"]["total_break_minutes"]
+
         self.update_progress_tab()
 
     def update_progress_tab(self):
         # Update total focus sessions
-        self.focus_sessions_today_value.configure(text=self.total_focus_sessions)
+        self.focus_sessions_today_value.configure(text=self.total_focus_sessions_completed)
 
         # update total focus time
-        focus_session_duration = self.saved_settings["user"]["users_focus_time"]
-        total_focus_duration = int(focus_session_duration) * self.total_focus_sessions
-        self.total_focus_minutes_value.configure(text=progress_times_formater(total_focus_duration))
+        self.total_focus_minutes_value.configure(text=progress_times_formater(self.total_focus_minutes))
 
         # update total breaks time
-        short_break_session_duration = self.saved_settings["user"]["users_short_break_time"]
-        total_short_break_duration = int(short_break_session_duration) * self.total_short_break_sessions
-        long_break_session_duration = self.saved_settings["user"]["users_long_break_time"]
-        total_long_break_duration = int(long_break_session_duration) * self.total_long_break_sessions
-        total_breaks_duration = total_short_break_duration + total_long_break_duration
-        self.total_breaks_today_value.configure(text=progress_times_formater(total_breaks_duration))
+        self.total_breaks_today_value.configure(text=progress_times_formater(self.total_break_minutes))
 
         # update target focus sessions meter
         target_focus_sessions = self.saved_settings["user"]["users_target_sessions"]
+        focus_session_duration = self.saved_settings["user"]["users_focus_time"]
 
         self.focus_target_meter.configure(
             amounttotal=target_focus_sessions,
-            amountused=self.total_focus_sessions if self.total_focus_sessions <= target_focus_sessions else target_focus_sessions,
-            subtext=f"{self.total_focus_sessions}/{target_focus_sessions}",
+            amountused=self.total_focus_sessions_completed if self.total_focus_sessions_completed <= target_focus_sessions else target_focus_sessions,
+            subtext=f"{self.total_focus_sessions_completed}/{target_focus_sessions}",
         )
 
         target_focus_duration = int(focus_session_duration) * target_focus_sessions
         self.target_min_meter.configure(
             amounttotal=target_focus_duration,
-            amountused=total_focus_duration if total_focus_duration <= int(target_focus_duration) else target_focus_duration,
-            subtext=f"{total_focus_duration}/{target_focus_duration}",
+            amountused=self.total_focus_minutes if self.total_focus_minutes <= int(target_focus_duration) else target_focus_duration,
+            subtext=f"{self.total_focus_minutes}/{target_focus_duration}",
         )
-
-
-        user_progress_data={
-            "total_focus_sessions_completed": self.total_focus_sessions,
-            "total_short_breaks_got": self.total_short_break_sessions,
-            "total_long_breaks_got": self.total_long_break_sessions
-        }
-        self.update_user_settings(user_progress_data)
 
     def update_bottom_text(self):
         is_first_launch = self.saved_settings["app"]['first_launch']
@@ -228,24 +218,12 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
             self.main_bottom_text.configure(text=self.window_bottom_text)
             self.progress_bottom_text.configure(text=self.window_bottom_text)
 
-    def _running_after_every_seconds(self):
-        self.update_progress_tab()
-        self.update_bottom_text()
-
-    def _run_after_long_break(self):
-        quote = random_quote()
-        self.quote_text.configure(text=quote)
-
-    def _run_after_finishing_session(self):
-        if self.play_session_sound_tick.get():
-            play_notification_sound()
-
     def handle_reset_today_progress_click(self):
         super().handle_reset_today_progress_click()
         if self.reset_today_progress:
-            self.total_focus_sessions = 0
-            self.total_short_break_sessions = 0
-            self.total_long_break_sessions = 0
+            self.total_focus_sessions_completed = 0
+            self.total_short_break_sessions_completed = 0
+            self.total_long_break_sessions_completed = 0
             self.update_progress_tab()
             self.reset_today_progress = False
 
@@ -262,3 +240,25 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
     def finish_downloading(self):
         super().finish_downloading()
         self.quit()
+
+
+    def _running_after_every_minutes(self):
+        user_progress_data={
+            "total_focus_sessions_completed": self.total_focus_sessions_completed,
+            "total_short_breaks_completed": self.total_short_break_sessions_completed,
+            "total_long_breaks_completed": self.total_long_break_sessions_completed,
+            "total_focus_minutes": self.total_focus_minutes,
+            "total_break_minutes": self.total_break_minutes,
+        }
+        self.update_user_settings(user_progress_data)
+
+        self.update_progress_tab()
+        self.update_bottom_text()
+
+    def _run_after_long_break(self):
+        quote = random_quote()
+        self.quote_text.configure(text=quote)
+
+    def _run_after_finishing_every_sessions(self):
+        if self.play_session_sound_tick.get():
+            play_notification_sound()

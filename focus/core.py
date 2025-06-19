@@ -5,14 +5,13 @@ class Sessions:
 
         self.application = application
 
-        self.saved_session_time_in_minutes: int
-        self.saved_short_break_time_in_minutes: int
-        self.saved_long_break_time_in_minutes: int
-
         self.session_times: dict = {"focus": 6, "shortB": 3, "longB": 5}
         self.current_session: str = "focus"  # Can use focus, shortB, and longB
         self.session_number: int = 1
         self.session_started: bool = False
+
+        self.minute_counter: int = 60
+        """ just a counter for the minute. This will be reduced by 1, every second """
 
         self.current_running_seconds: int = -1
         """
@@ -21,13 +20,16 @@ class Sessions:
         timer has stopped by the user at 0 seconds so it will pass the zero as seconds. When it passes 0 as the 
         seconds for the timer, the timer will jump to the next session immediately.
         """
+
         self.formated_current_running_time: str = ''
-        self.timer = ''
+        self.timer = '' # The running thread of the timer that counts down the seconds
 
-        self.total_focus_sessions: int = 0
-        self.total_short_break_sessions: int = 0
-        self.total_long_break_sessions: int = 0
+        self.total_focus_sessions_completed: int = 0
+        self.total_short_break_sessions_completed: int = 0
+        self.total_long_break_sessions_completed: int = 0
 
+        self.total_focus_minutes: int = 0
+        self.total_break_minutes: int = 0
 
 
     def reset_variables(self):
@@ -55,30 +57,40 @@ class Sessions:
         return self.formated_current_running_time
 
     def countdown(self, seconds: int, application):
-        """ The main core of the app. Countdown function. """
+        """ The main core of the app. Function that counts down the seconds and updates the UI. """
 
         self.current_running_seconds = seconds
         self.formate_time(seconds)
         self._running_after_every_seconds()
 
+        if self.minute_counter == 0:
+            if self.current_session == "focus":
+                self.total_focus_minutes += 1
+            elif self.current_session in ("shortB","longB" ):
+                self.total_break_minutes += 1
+
+            self._running_after_every_minutes()
+            self.minute_counter = 61 # sets to 61 because it will reduce by 1 bellow :)
+        self.minute_counter -= 1
+
+
         if seconds >= 0:
-
+            # Update the UI Timer & Meter with the new time
             self.application.update_ui_timer(self.formated_current_running_time)
+            self.application.update_ui_meter(seconds, self.session_times[f"{self.current_session}"])
 
-            # used_percentage = math.floor((seconds / self.session_times[f"{self.current_session}"]) * 100)
-            application.update_ui_meter(seconds, self.session_times[f"{self.current_session}"])
-
+            # Countdown the seconds
             self.timer = application.after(1000, self.countdown, self.current_running_seconds - 1, self.application)
 
         elif self.current_running_seconds < 0:
-            self._run_after_finishing_session()
+            self._run_after_finishing_every_sessions()
 
             if self.current_session == "focus":
-                self.total_focus_sessions += 1
+                self.total_focus_sessions_completed += 1
             elif self.current_session == "shortB":
-                self.total_short_break_sessions += 1
+                self.total_short_break_sessions_completed += 1
             elif self.current_session == "longB":
-                self.total_long_break_sessions += 1
+                self.total_long_break_sessions_completed += 1
 
             self.session_number += 1
             if self.session_number > 8:
@@ -136,10 +148,15 @@ class Sessions:
         # To be overwritten by controller
         pass
 
+    def _running_after_every_minutes(self):
+        # To be overwritten by controller
+        pass
+
+    def _run_after_finishing_every_sessions(self):
+        # To be overwritten by controller
+        pass
+
     def _run_after_long_break(self):
         # To be overwritten by controller
         pass
 
-    def _run_after_finishing_session(self):
-        # To be overwritten by controller
-        pass
