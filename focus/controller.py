@@ -165,7 +165,6 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
 
     def _on_settings_close(self):
         self.update_ui_settings_with_saved_settings()
-        print("Is it working?")
 
     def update_ui_settings_with_saved_settings(self, start = False):
         self.users_target_focus_periods.set(self.saved_settings["user"]["users_target_sessions"])
