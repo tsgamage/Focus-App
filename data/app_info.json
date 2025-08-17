@@ -1,8 +1,8 @@
 {
   "name": "Focus App",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "build_type": "release",
-  "build_date": "2025-06-09",
-  "publisher": "Princess Software Solutions",
+  "build_date": "2025-08-17",
+  "publisher": "Crownix Technologies",
   "check_updates": true
 }
