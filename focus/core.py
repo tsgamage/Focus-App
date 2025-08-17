@@ -26,7 +26,7 @@ class Sessions(DesktopNotifier):
         """
 
         self.formated_current_running_time: str = ''
-        self.timer = '' # The running thread of the timer that counts down the seconds
+        self.timer = ''  # The running thread of the timer that counts down the seconds
 
         self.total_focus_sessions_completed: int = 0
         self.total_short_break_sessions_completed: int = 0
@@ -34,7 +34,6 @@ class Sessions(DesktopNotifier):
 
         self.total_focus_minutes: int = 0
         self.total_break_minutes: int = 0
-
 
     def reset_variables(self):
         self.current_running_seconds = -1
@@ -57,7 +56,7 @@ class Sessions(DesktopNotifier):
         if timer_sec == 0:
             timer_sec = "00"
 
-        self.formated_current_running_time =  f"{timer_min}:{timer_sec}"
+        self.formated_current_running_time = f"{timer_min}:{timer_sec}"
         return self.formated_current_running_time
 
     def countdown(self, seconds: int, application):
@@ -70,13 +69,12 @@ class Sessions(DesktopNotifier):
         if self.minute_counter == 0:
             if self.current_session == "focus":
                 self.total_focus_minutes += 1
-            elif self.current_session in ("shortB","longB" ):
+            elif self.current_session in ("shortB", "longB"):
                 self.total_break_minutes += 1
 
             self._running_after_every_minutes()
-            self.minute_counter = 61 # sets to 61 because it will reduce by 1 bellow :)
+            self.minute_counter = 61  # sets to 61 because it will reduce by 1 bellow :)
         self.minute_counter -= 1
-
 
         if seconds >= 0:
             # Update the UI Timer & Meter with the new time
@@ -90,10 +88,22 @@ class Sessions(DesktopNotifier):
             self._run_after_finishing_every_sessions()
 
             if self.current_session == "focus":
+                if self.session_number == 7:
+                    self.send_notification(title="Yeah! It's time for a long break!", message="You did a great job!",
+                                           icon_path="assets/icons/nap.ico")
+                else:
+                    self.send_notification(title="Boring? Get a quick break!", message="Refresh yourself...",
+                                           icon_path="assets/icons/rest-time.ico")
                 self.total_focus_sessions_completed += 1
+
             elif self.current_session == "shortB":
+                self.send_notification(title="Focus on your GOAL!", message="Get some work done...",
+                                       icon_path="assets/icons/target.ico")
                 self.total_short_break_sessions_completed += 1
+
             elif self.current_session == "longB":
+                self.send_notification(title="Focus on your GOAL!", message="Get some work done...",
+                                       icon_path="assets/icons/target.ico")
                 self.total_long_break_sessions_completed += 1
 
             self.session_number += 1
@@ -103,7 +113,6 @@ class Sessions(DesktopNotifier):
             self.start_session()
 
     def start_session(self):
-
 
         """
         The interval periods of this app
@@ -119,7 +128,6 @@ class Sessions(DesktopNotifier):
 
         if self.session_number == 8:
             self.current_session = "longB"
-            self.send_notification(title="Yeah! It's time for a long break!", message="You did a great job!", icon_path="assets/icons/nap.ico")
 
             passing_value_for_countdown: int = self.session_times["longB"]
             if self.current_running_seconds >= 0:
@@ -131,7 +139,6 @@ class Sessions(DesktopNotifier):
 
         elif self.session_number % 2 == 0:
             self.current_session = "shortB"
-            self.send_notification(title="Boring? Get a quick break!", message="Refresh yourself...", icon_path="assets/icons/rest-time.ico")
 
             passing_value_for_countdown: int = self.session_times["shortB"]
             if self.current_running_seconds >= 0:
@@ -142,8 +149,6 @@ class Sessions(DesktopNotifier):
 
         elif self.session_number % 2 == 1:
             self.current_session = "focus"
-            self.send_notification(title="Focus on your GOAL!", message="Get some work done...", icon_path="assets/icons/target.ico")
-
 
             passing_value_for_countdown: int = self.session_times["focus"]
             if self.current_running_seconds >= 0:
@@ -167,4 +172,3 @@ class Sessions(DesktopNotifier):
     def _run_after_long_break(self):
         # To be overwritten by controller
         pass
-
