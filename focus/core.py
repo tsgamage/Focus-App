@@ -1,7 +1,11 @@
 import math
 
-class Sessions:
+from .desktopNotifier import DesktopNotifier
+
+
+class Sessions(DesktopNotifier):
     def __init__(self, application):
+        DesktopNotifier.__init__(self, app_name="Focus App")
 
         self.application = application
 
@@ -115,6 +119,7 @@ class Sessions:
 
         if self.session_number == 8:
             self.current_session = "longB"
+            self.send_notification(title="Yeah! It's time for a long break!", message="You did a great job!", icon_path="assets/icons/nap.ico")
 
             passing_value_for_countdown: int = self.session_times["longB"]
             if self.current_running_seconds >= 0:
@@ -126,6 +131,7 @@ class Sessions:
 
         elif self.session_number % 2 == 0:
             self.current_session = "shortB"
+            self.send_notification(title="Boring? Get a quick break!", message="Refresh yourself...", icon_path="assets/icons/rest-time.ico")
 
             passing_value_for_countdown: int = self.session_times["shortB"]
             if self.current_running_seconds >= 0:
@@ -136,6 +142,8 @@ class Sessions:
 
         elif self.session_number % 2 == 1:
             self.current_session = "focus"
+            self.send_notification(title="Focus on your GOAL!", message="Get some work done...", icon_path="assets/icons/target.ico")
+
 
             passing_value_for_countdown: int = self.session_times["focus"]
             if self.current_running_seconds >= 0:
