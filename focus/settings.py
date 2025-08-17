@@ -41,7 +41,7 @@ class FocusSettings:
                 "day": 9
             },
             "user": {
-                "theme": "superhero",
+                "theme": "darkly",
                 "users_target_sessions": 10,
                 "users_focus_time": 25,
                 "users_short_break_time": 5,
@@ -87,7 +87,7 @@ class FocusSettings:
         # Check if the settings file is correct. If not, reset it.
         if not setting_file_is_correct(self.saved_settings, self.FOLDER_STRUCTURE):
             log_debug("Resetting All settings to default values because settings file is not correct.")
-            self.update_user_settings("resetAll")
+            self.update_user_settings("resetFile")
 
         self.reset_user_settings_if_they_changed_to_wrong()
 
@@ -110,6 +110,11 @@ class FocusSettings:
 
     def update_user_settings(self, settings_to_save):
         users_data = settings_to_save
+
+        if settings_to_save == "resetFile":
+            users_data = self.FOLDER_STRUCTURE
+            log_info("Resetting settings file to default values.")
+
         if settings_to_save == "resetAll":
             users_data = self.DEFAULT_ALL_SETTINGS
             log_info("Changing all settings to default values.")
@@ -119,8 +124,13 @@ class FocusSettings:
             log_info("Changing user settings to default values.")
 
         updated_data = self.saved_settings
-        for key, value in users_data.items():
-            updated_data["user"][key] = value
+        # Resetting the whole file if the 'resetFile' is passed as settings_to_save.
+        # Otherwise, updating only the data wanted
+        if settings_to_save == "resetFile":
+            updated_data = self.FOLDER_STRUCTURE
+        else:
+            for key, value in users_data.items():
+                updated_data["user"][key] = value
 
         # Try to save the updated settings.
         try:
@@ -145,12 +155,7 @@ class FocusSettings:
             try:
                 with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                     json.dump(updated_date, settings_file, indent=4)
-                reset_progress = {
-                    "total_focus_sessions_completed": 0,
-                    "total_short_breaks_completed": 0,
-                    "total_long_breaks_completed": 0,
-                }
-                self.update_user_settings(reset_progress)
+                self.update_user_settings(self.DEFAULT_PROGRESS_SETTINGS)
                 log_info("Progress reset successful.")
             except FileNotFoundError:
                 print("Error: Could not save settings.")
