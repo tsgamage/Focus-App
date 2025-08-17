@@ -42,6 +42,7 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
 
         self.get_current_app_info()
         self.update_app()
+        self.update_quote()
 
 
 
@@ -50,6 +51,10 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
         self.start_pause_button.configure(command=self.handle_start_pause_button)
         self.skip_button.configure(command=self.skip_session)
         self.reset_timer_button.configure(command=self.reset_timer)
+
+    def update_quote(self):
+        quote = random_quote()
+        self.quote_text.configure(text=quote)
 
     # Hiding the window when the close button clicked
     def hide_window(self):
@@ -255,9 +260,9 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
         self.update_bottom_text()
 
     def _run_after_long_break(self):
-        quote = random_quote()
-        self.quote_text.configure(text=quote)
+        pass
 
     def _run_after_finishing_every_sessions(self):
         if self.play_session_sound_tick.get():
             play_notification_sound()
+            self.update_quote()
