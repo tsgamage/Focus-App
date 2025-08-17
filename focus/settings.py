@@ -1,6 +1,6 @@
 import json
 import datetime as dt
-import os
+from .loggingHandler import *
 
 
 def setting_file_is_correct(user_data_dict, default_data_dict):
@@ -86,6 +86,7 @@ class FocusSettings:
 
         # Check if the settings file is correct. If not, reset it.
         if not setting_file_is_correct(self.saved_settings, self.FOLDER_STRUCTURE):
+            log_debug("Resetting All settings to default values because settings file is not correct.")
             self.update_user_settings("resetAll")
 
         self.reset_user_settings_if_they_changed_to_wrong()
@@ -98,20 +99,24 @@ class FocusSettings:
         try:
             with open(self.USER_SETTINGS_FILE_PATH, "r") as settings_file:
                 self.saved_settings = json.load(settings_file)
+            log_info("Settings loaded successfully.")
 
         # Create the settings file if it doesn't exist and insert default values.
         except:
             self.saved_settings = self.FOLDER_STRUCTURE
             with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                 json.dump(self.FOLDER_STRUCTURE, settings_file, indent=4)
+            log_info("Settings file created successfully.")
 
     def update_user_settings(self, settings_to_save):
         users_data = settings_to_save
         if settings_to_save == "resetAll":
             users_data = self.DEFAULT_ALL_SETTINGS
+            log_info("Changing all settings to default values.")
 
         if settings_to_save == "resetSettings":
             users_data = self.DEFAULT_USER_SETTINGS
+            log_info("Changing user settings to default values.")
 
         updated_data = self.saved_settings
         for key, value in users_data.items():
@@ -122,7 +127,10 @@ class FocusSettings:
             with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                 json.dump(updated_data, settings_file, indent=4)
 
+            log_info("Settings updated successfully.")
+
         except FileNotFoundError:
+            log_error("Settings update failed.")
             print("Error: Could not save settings.")
 
         finally:
@@ -143,8 +151,10 @@ class FocusSettings:
                     "total_long_breaks_completed": 0,
                 }
                 self.update_user_settings(reset_progress)
+                log_info("Progress reset successful.")
             except FileNotFoundError:
                 print("Error: Could not save settings.")
+                log_error("Progress reset failed.")
                 return
             finally:
                 self.load_settings()
@@ -162,8 +172,10 @@ class FocusSettings:
             try:
                 with open(self.USER_SETTINGS_FILE_PATH, "w") as settings_file:
                     json.dump(updated_data, settings_file, indent=4)
+                log_info("First launch update successful.")
             except FileNotFoundError:
                 print("Error: Could not save settings.")
+                log_error("First launch update failed.")
                 return
             finally:
                 self.saved_settings = updated_data
@@ -189,7 +201,9 @@ class FocusSettings:
         is_total_break_minutes_is_int = not isinstance(self.saved_settings["user"]["total_break_minutes"], int)
 
         if is_target_sessions_zero or is_focus_time_zero or is_short_break_time_zero or is_long_break_time_zero:
+            log_debug("Resetting All settings to default values because some values are zero.")
             self.update_user_settings("resetAll")
 
         if is_first_launch_is_bool or is_day_is_int or is_target_sessions_is_int or is_focus_time_is_int or is_short_break_time_is_int or is_long_break_time_is_int or is_total_focus_sessions_completed_is_int or is_total_short_breaks_completed_is_int or is_total_long_breaks_completed_is_int or is_total_focus_minutes_is_int or is_total_break_minutes_is_int:
+            log_debug("Resetting All settings to default values because data type of some values are wrong.")
             self.update_user_settings("resetAll")
