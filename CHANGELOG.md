@@ -5,6 +5,27 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v2.0.0](https://github.com/tsgamage/Focus-App/releases/tag/v2.0.0) - 2025-08-17
+
+### Added
+- Improved minimize-to-tray functionality for smoother background usage.
+- New timer mechanism: the app now updates every minute instead of only after sessions.
+- Fresh quotes system: inspiring quotes appear every time the app launches or when sessions change.
+- Desktop notifications to alert users of session changes.
+- Logging functionality for better tracking and debugging.
+
+### Fixed
+- When a user exists settings without saving, now the changes will be reset to the previous values
+- Fixed issue where all settings were unintentionally reset when the app launched (Rarely happens) .
+
+### Removed
+- Removed the separate `quotes.json` and inserted its data into the `quotes.py`
+
+### Notes
+- This release marks a major step forward in usability and mindfulness, introducing notifications, fresh quotes, and a smarter timer system.
+
+---
+
 ## [v1.2.0](https://github.com/tsgamage/Focus-App/releases/tag/v1.2.0) - 2025-06-10
 
 ### Added
