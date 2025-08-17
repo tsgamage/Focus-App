@@ -228,8 +228,13 @@ class FocusController(FocusApp, Sessions, FocusSettings, AutoUpdate):
             self.total_focus_sessions_completed = 0
             self.total_short_break_sessions_completed = 0
             self.total_long_break_sessions_completed = 0
+
+            self.total_focus_minutes: int = 0
+            self.total_break_minutes: int = 0
+
             self.update_progress_tab()
             self.reset_today_progress = False
+            self._running_after_every_minutes()
 
     def get_saved_session_times(self):
         saved_session_times = {
