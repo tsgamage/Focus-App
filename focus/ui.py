@@ -1,8 +1,6 @@
 import ttkbootstrap as tb
 import tkinter as tk
-from tkinter import filedialog
 from tkinter import messagebox
-import os
 
 class FocusApp(tb.Window):
     def __init__(self):

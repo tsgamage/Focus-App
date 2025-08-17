@@ -1,6 +1,5 @@
 from tkinter import ttk
 import tkinter as tk
-from tkinter import messagebox
 import ttkbootstrap as tb
 
 class UpdateWindow():

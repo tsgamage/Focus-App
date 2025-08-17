@@ -3,3 +3,4 @@ pygame>=2.5.0
 Pillow>=10.0.0
 pystray>=0.19.4
 requests~=2.32.3
+plyer~=2.1.0
